@@ -1,0 +1,10 @@
+CREATE TABLE sandbox.clean_data
+(
+  time TIMESTAMP
+, equipment_id INT 
+, latitude FLOAT(20)
+, longitude FLOAT(20)
+, elevation FLOAT(20)
+, speed FLOAT(20)
+) 
+;

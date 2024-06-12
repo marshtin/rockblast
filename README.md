@@ -1,1 +1,1 @@
-Repositorio para proyecto de RockBlast, USS 2024-S1
+Repositorio para proyecto con RockBlast, Taller de Empresa I USS 2024-S1

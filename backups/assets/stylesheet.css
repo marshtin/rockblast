@@ -51,35 +51,44 @@
 /*Nuevos estilos*/
 
 body {
-    background-color: #e0e0e0;
-    margin: 0 auto;
-  }
+  background: linear-gradient(to bottom, #E6EBEB, #8ed1fc, #0693e3);
+  margin: 0;
+  padding: 0;
+  height: 100vh; /* Ajusta el cuerpo al 100% del viewport height */
+  overflow: hidden; /* Evita el desplazamiento vertical */
+}
+
+
+
   
   #title {
     text-align: center;
   }
+
+
 .banner {
-height: 75px;
-margin: 0px -10px 10px;
-background-color: #FFFFFF;
-border-radius: 2px;
-display: block;
+  height: 75px;
+  margin: 0px -10px 10px;
+  background-color: white;
+  border-radius: 2px;
+  display: flex; /* Usamos flexbox para centrar */
+  align-items: center; /* Centra verticalmente */
 }
 
-.banner h1{
-    color: black;
-    padding-top: 5px;
-    margin-left: 2%;
-    display: inline-block;
-    text-align: center;
+.banner img {
+  margin-left: 10px; /* Margen a la izquierda para el logo */
+  height: 100%; /* Ajustamos la altura del logo al contenedor */
+  align-self: flex-start; /* Alinea el logo a la esquina izquierda */
 }
 
-.banner Img{
-    position: relative;
-    float: right;
-    right: 30px;
-    height: 75px;
+.banner h1 {
+  color: black;
+  padding-top: 5px;
+  margin: 0 auto; /* Centra horizontalmente el título */
+  text-align: center; /* Alinea el texto al centro */
 }
+
+
 
 
 

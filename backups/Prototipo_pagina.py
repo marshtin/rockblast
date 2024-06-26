@@ -33,101 +33,144 @@ z0 = df_0['elevation'].tolist()
 app = dash.Dash(__name__)
 
 app.layout = html.Div([
+    # Incluir Google Fonts
+    html.Link(
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap",
+        rel="stylesheet"
+    ),
+
     html.Div([
-        html.H1('Velocidades por caminos'),
+        html.H1('Velocidades por caminos',style={'color': '#0693e3'}),
         html.Img(src='assets/Rockblast.png')
-    ], className='banner'),
+    ], className='banner', style={'font-family': 'Noto Sans, sans-serif'}),
 
     html.Div([
         html.Div([
-            html.P('Ingresar ID', className='fix_label', style={'color': 'black', 'margin-top': '2px'}),
-            dcc.Input(id='input-id', type='text', placeholder='Ingrese un ID'),
-            html.Button('Guardar', id='save-button', n_clicks=0),
-            html.Div(id='output-state', style={'margin-top': '10px'})
-        ], className='create_container2 five columns', style={'margin-bottom': '20px'}),
-    ], className='row flex-display'),
+            html.P('Ingresar ID', className='fix_label', style={'margin-top': '2px', 'color': 'black', 'font-size': '20px', 'margin': '10px', 'font-family': 'Noto Sans, sans-serif'}),
+            dcc.Input(id='input-id', type='text', placeholder='Ingrese un ID', style={'width': '100%', 'height': '50px', 'font-size': '20px', 'font-family': 'Noto Sans, sans-serif'}),
+            html.Button('Aplicar Cambios', id='save-button', n_clicks=0, style={'margin-top': '10px', 'width': '100%', 'font-size': '20px', 'font-family': 'Noto Sans, sans-serif'}),
+        ], className='create_container2 four columns', style={'margin-bottom': '20px', 'width': '33%'}),
+
+        html.Div([
+            html.P('Filtro por Flota', className='fix_label', style={'margin-top': '2px', 'color': 'black', 'font-size': '20px', 'margin': '10px', 'font-family': 'Noto Sans, sans-serif'}),
+            dcc.Dropdown(
+                id='dropdown-1',
+                options=[
+                    {'label': 'CAT1', 'value': 'opcion_1'},
+                    {'label': 'CAT2', 'value': 'opcion_2'},
+                    {'label': 'CAT3', 'value': 'opcion_3'},
+                    {'label': 'CAT4', 'value': 'opcion_4'},
+                    {'label': 'CAT5', 'value': 'opcion_5'}
+                ],
+                placeholder='Seleccione una opción',
+                style={'width': '100%', 'height': '50px', 'font-size': '15px', 'font-family': 'Noto Sans, sans-serif'}
+            ),
+            html.Button('Aplicar Cambios', id='save-button-2', n_clicks=0, style={'margin-top': '10px', 'width': '100%', 'font-size': '20px', 'font-family': 'Noto Sans, sans-serif'}),
+        ], className='create_container2 four columns', style={'margin-bottom': '20px', 'width': '33%'}),
+
+        html.Div([
+            html.P('Ingresar Flota Personalizada', className='fix_label', style={'margin-top': '2px', 'color': 'black', 'font-size': '20px', 'margin': '10px', 'font-family': 'Noto Sans, sans-serif'}),
+            dcc.Input(id='flota-personalizada', type='text', placeholder='Ingrese un ID', style={'width': '100%', 'height': '50px', 'font-size': '20px', 'font-family': 'Noto Sans, sans-serif'}),
+            html.Button('Aplicar Cambios', id='save-button-3', n_clicks=0, style={'margin-top': '10px', 'width': '100%', 'font-size': '20px', 'font-family': 'Noto Sans, sans-serif'}),
+        ], className='create_container2 four columns', style={'margin-bottom': '20px', 'width': '33%'}),
+        
+    ], className='row flex-display', style={'width': '100%', 'font-family': 'Noto Sans, sans-serif'}),
+
+    html.Div(id='output-state', style={'margin-top': '10px', 'font-family': 'Noto Sans, sans-serif'}),
 
     html.Div([
-        dcc.Graph(
-            id='3d-scatter-plot',
-            figure={
-                'data': [
-                    go.Scatter3d(
-                        x=x,
-                        y=y,
-                        z=z,
-                        mode='markers',
-                        marker=dict(
-                            size=5,
-                            color=s,
-                            colorscale='Viridis',
-                            opacity=0.8,
+        html.Div([
+            dcc.Graph(
+                id='3d-scatter-plot',
+                figure={
+                    'data': [
+                        go.Scatter3d(
+                            x=x,
+                            y=y,
+                            z=z,
+                            mode='markers',
+                            marker=dict(
+                                size=5,
+                                color=s,
+                                colorscale='Viridis',
+                                opacity=0.8,
+                            ),
+                            name='Con velocidad'
                         ),
-                        name='Con velocidad'
-                    ),
-                    go.Scatter3d(
-                        x=x0,
-                        y=y0,
-                        z=z0,
-                        mode='markers',
-                        marker=dict(
-                            size=5,
-                            color='red',
-                            opacity=0.8,
+                        go.Scatter3d(
+                            x=x0,
+                            y=y0,
+                            z=z0,
+                            mode='markers',
+                            marker=dict(
+                                size=5,
+                                color='red',
+                                opacity=0.8,
+                            ),
+                            name='Sin velocidad'
+                        )
+                    ],
+                    'layout': go.Layout(
+                        title='Velocidades en camino',
+                        scene=dict(
+                            xaxis=dict(title='Latitud'),
+                            yaxis=dict(title='Longitud'),
+                            zaxis=dict(title='Elevación'),
                         ),
-                        name='Sin velocidad'
+                        font=dict(family='Noto Sans, sans-serif')
                     )
-                ],
-                'layout': go.Layout(
-                    title='Velocidades en camino',
-                    scene=dict(
+                }
+            )
+        ], style={'flex': '1', 'padding': '10px'}),
+
+        html.Div([
+            dcc.Graph(
+                id='2d-scatter-plot',
+                figure={
+                    'data': [
+                        go.Scatter(
+                            x=x,
+                            y=y,
+                            mode='markers',
+                            marker=dict(
+                                size=5,
+                                color=s,
+                                colorscale='Viridis',
+                                opacity=0.8,
+                            ),
+                            name='Con velocidad'
+                        ),
+                        go.Scatter(
+                            x=x0,
+                            y=y0,
+                            mode='markers',
+                            marker=dict(
+                                size=5,
+                                color='red',
+                                opacity=0.8,
+                            ),
+                            name='Sin velocidad'
+                        )
+                    ],
+                    'layout': go.Layout(
+                        title='Velocidades en camino (2D)',
                         xaxis=dict(title='Latitud'),
                         yaxis=dict(title='Longitud'),
-                        zaxis=dict(title='Elevación'),
+                        font=dict(family='Noto Sans, sans-serif')
                     )
-                )
-            }
-        )
-    ]),
+                }
+            )
+        ], style={'flex': '1', 'padding': '10px'})
+    ], style={'display': 'flex'}),
 
     html.Div([
-        dcc.Graph(
-            id='2d-scatter-plot',
-            figure={
-                'data': [
-                    go.Scatter(
-                        x=x,
-                        y=y,
-                        mode='markers',
-                        marker=dict(
-                            size=5,
-                            color=s,
-                            colorscale='Viridis',
-                            opacity=0.8,
-                        ),
-                        name='Con velocidad'
-                    ),
-                    go.Scatter(
-                        x=x0,
-                        y=y0,
-                        mode='markers',
-                        marker=dict(
-                            size=5,
-                            color='red',
-                            opacity=0.8,
-                        ),
-                        name='Sin velocidad'
-                    )
-                ],
-                'layout': go.Layout(
-                    title='Velocidades en camino (2D)',
-                    xaxis=dict(title='Latitud'),
-                    yaxis=dict(title='Longitud'),
-                )
-            }
-        )
-    ])
-])
+        html.Button('Velocidad 0', id='button-1', style={'font-size': '20px', 'padding': '15px 30px', 'margin': '10px', 'font-family': 'Noto Sans, sans-serif'}),
+        html.Button('Velocidad En Caminos', id='button-2', style={'font-size': '20px', 'padding': '15px 30px', 'margin': '10px', 'font-family': 'Noto Sans, sans-serif'}),
+        html.Button('Limpiar Filtros', id='button-3', style={'font-size': '20px', 'padding': '15px 30px', 'margin': '10px', 'font-family': 'Noto Sans, sans-serif'})
+    ], style={'display': 'flex', 'justify-content': 'center', 'margin-top': '20px'})
+
+
+], style={'font-family': 'Noto Sans, sans-serif'})
 
 if __name__ == '__main__':
     app.run_server(debug=True)

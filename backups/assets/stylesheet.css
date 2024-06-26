@@ -99,7 +99,7 @@ body {
     padding: 15px;
     position: relative;
     box-shadow: 4px 4px 4px 4px lightgrey;
-    overflow-y:auto
+    overflow-y:visible; 
   }
   
   .create_container1 {
@@ -124,6 +124,19 @@ body {
   
   .container-display {
     display: flex;
+  }
+
+  /* Estilo para todos los dropdowns con la clase 'custom-dropdown' */
+  .custom-dropdown .Select__menu {
+    max-height: 200px; /* Altura máxima del menú desplegable */
+    overflow-y: auto;  /* Habilitar barra deslizadora vertical */
+    z-index: 1000; /* Asegurarse de que el menú desplegable esté en la parte superior */
+  }
+
+  /* Asegurar que el dropdown container tiene posicion relativa */
+  .custom-dropdown .Select__control {
+    position: relative;
+    z-index: 1;
   }
   
   #header {

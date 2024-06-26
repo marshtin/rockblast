@@ -32,6 +32,24 @@ z0 = df_0['elevation'].tolist()
 # Crear la aplicación Dash
 app = dash.Dash(__name__)
 
+#Lista nombre de camiones
+lista_name = [
+    "C07",
+    "C130",
+    "C15",
+    "C17",
+    "C37",
+    "C49",
+    "C56"
+]
+
+#Lista nombre de flota de camiones
+lista_type_name = [
+    "CAT 793 C",
+    "CAT 797 B",
+    "CAT 797 F",
+    "KOM 930 E"
+]
 app.layout = html.Div([
     # Incluir Google Fonts
     html.Link(
@@ -39,35 +57,41 @@ app.layout = html.Div([
         rel="stylesheet"
     ),
 
+    #Banner de la página
     html.Div([
         html.H1('Velocidades por caminos',style={'color': '#0693e3'}),
         html.Img(src='assets/Rockblast.png')
     ], className='banner', style={'font-family': 'Noto Sans, sans-serif'}),
 
     html.Div([
+
+        #Filtro Buscar por ID (Menú Desplegable)
         html.Div([
-            html.P('Ingresar ID', className='fix_label', style={'margin-top': '2px', 'color': 'black', 'font-size': '20px', 'margin': '10px', 'font-family': 'Noto Sans, sans-serif'}),
-            dcc.Input(id='input-id', type='text', placeholder='Ingrese un ID', style={'width': '100%', 'height': '50px', 'font-size': '20px', 'font-family': 'Noto Sans, sans-serif'}),
-            html.Button('Aplicar Cambios', id='save-button', n_clicks=0, style={'margin-top': '10px', 'width': '100%', 'font-size': '20px', 'font-family': 'Noto Sans, sans-serif'}),
+            html.P('Filtro por ID', className='fix_label', style={'margin-top': '2px', 'color': 'black', 'font-size': '20px', 'margin': '10px', 'font-family': 'Noto Sans, sans-serif'}),
+            dcc.Dropdown(
+                id='dropdown-1',
+                className='custom-dropdown',
+                options=[{'label': nombre_camion, 'value': nombre_camion} for nombre_camion in lista_name],  #Recorre la lista de nombre de camiones
+                placeholder='Seleccione una opción',
+                style={'width': '100%', 'height': '50px', 'font-size': '20px', 'font-family': 'Noto Sans, sans-serif'}
+            ),
+            html.Button('Aplicar Cambios', id='save-button-1', n_clicks=0, style={'margin-top': '10px', 'width': '100%', 'font-size': '20px', 'font-family': 'Noto Sans, sans-serif'}),
         ], className='create_container2 four columns', style={'margin-bottom': '20px', 'width': '33%'}),
 
+        #Filtro Buscar por Flota
         html.Div([
             html.P('Filtro por Flota', className='fix_label', style={'margin-top': '2px', 'color': 'black', 'font-size': '20px', 'margin': '10px', 'font-family': 'Noto Sans, sans-serif'}),
             dcc.Dropdown(
-                id='dropdown-1',
-                options=[
-                    {'label': 'CAT1', 'value': 'opcion_1'},
-                    {'label': 'CAT2', 'value': 'opcion_2'},
-                    {'label': 'CAT3', 'value': 'opcion_3'},
-                    {'label': 'CAT4', 'value': 'opcion_4'},
-                    {'label': 'CAT5', 'value': 'opcion_5'}
-                ],
+                id='dropdown-2',
+                className='custom-dropdown',
+                options=[{'label': nombre_flota, 'value': nombre_flota} for nombre_flota in lista_type_name],  #Recorre la lista de nombre de flota de camiones
                 placeholder='Seleccione una opción',
-                style={'width': '100%', 'height': '50px', 'font-size': '15px', 'font-family': 'Noto Sans, sans-serif'}
+                style={'width': '100%', 'height': '50px', 'font-size': '20px', 'font-family': 'Noto Sans, sans-serif'}
             ),
             html.Button('Aplicar Cambios', id='save-button-2', n_clicks=0, style={'margin-top': '10px', 'width': '100%', 'font-size': '20px', 'font-family': 'Noto Sans, sans-serif'}),
         ], className='create_container2 four columns', style={'margin-bottom': '20px', 'width': '33%'}),
 
+        #Filtro Ingresar Flota personalizada
         html.Div([
             html.P('Ingresar Flota Personalizada', className='fix_label', style={'margin-top': '2px', 'color': 'black', 'font-size': '20px', 'margin': '10px', 'font-family': 'Noto Sans, sans-serif'}),
             dcc.Input(id='flota-personalizada', type='text', placeholder='Ingrese un ID', style={'width': '100%', 'height': '50px', 'font-size': '20px', 'font-family': 'Noto Sans, sans-serif'}),
@@ -164,8 +188,8 @@ app.layout = html.Div([
     ], style={'display': 'flex'}),
 
     html.Div([
-        html.Button('Velocidad 0', id='button-1', style={'font-size': '20px', 'padding': '15px 30px', 'margin': '10px', 'font-family': 'Noto Sans, sans-serif'}),
-        html.Button('Velocidad En Caminos', id='button-2', style={'font-size': '20px', 'padding': '15px 30px', 'margin': '10px', 'font-family': 'Noto Sans, sans-serif'}),
+        html.Button('Velocidad En Camino', id='button-1', style={'font-size': '20px', 'padding': '15px 30px', 'margin': '10px', 'font-family': 'Noto Sans, sans-serif'}),
+        html.Button('Velocidad 0', id='button-2', style={'font-size': '20px', 'padding': '15px 30px', 'margin': '10px', 'font-family': 'Noto Sans, sans-serif'}),
         html.Button('Limpiar Filtros', id='button-3', style={'font-size': '20px', 'padding': '15px 30px', 'margin': '10px', 'font-family': 'Noto Sans, sans-serif'})
     ], style={'display': 'flex', 'justify-content': 'center', 'margin-top': '20px'})
 

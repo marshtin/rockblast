@@ -1,0 +1,14 @@
+CREATE TABLE sandbox.fleet
+(
+  time TIMESTAMP
+, equipment_id INT
+, type VARCHAR(30)
+, name VARCHAR(30)
+, type_id VARCHAR(30)
+, type_name VARCHAR(50)
+, latitude FLOAT(20)
+, longitude FLOAT(20)
+, elevation FLOAT(20)
+, speed FLOAT(20)
+) 
+;

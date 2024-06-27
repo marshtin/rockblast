@@ -44,8 +44,8 @@ def get_fleet_data_by_type(conn, type_name):
     if conn is None:
         raise Exception("Failed to connect to the database. Please check your configuration.")
     
-    query_with_speed = f"SELECT * FROM sandbox.fleet WHERE type_name = '{type_name}' AND elevation != 0 AND speed > 0"
-    query_without_speed = f"SELECT * FROM sandbox.fleet WHERE type_name = '{type_name}' AND elevation != 0 AND speed = 0"
+    query_with_speed = f"SELECT * FROM sandbox.fleet WHERE type_name = '{type_name}' AND elevation != 0 AND speed > 0 AND EXTRACT(HOUR FROM time) = 24 ORDER BY time"
+    query_without_speed = f"SELECT * FROM sandbox.fleet WHERE type_name = '{type_name}' AND elevation != 0 AND speed = 0 AND EXTRACT(HOUR FROM time) = 24 ORDER BY time"
     
     df_with_speed = sqlio.read_sql_query(query_with_speed, conn)
     df_without_speed = sqlio.read_sql_query(query_without_speed, conn)
@@ -54,8 +54,8 @@ def get_fleet_data_by_type(conn, type_name):
 
 # Visualizar los datos con Plotly
 def visualize_name_data(query_aux):
-    df = sqlio.read_sql_query(f"SELECT * FROM sandbox.gps_{query_aux} WHERE elevation != 0 AND speed > 0", conn)
-    df_0 = sqlio.read_sql_query(f"SELECT * FROM sandbox.gps_{query_aux} WHERE elevation != 0 AND speed = 0", conn)
+    df = sqlio.read_sql_query(f"SELECT * FROM sandbox.gps_{query_aux} WHERE elevation != 0 AND speed > 0 AND EXTRACT(HOUR FROM time) = 24 ORDER BY time", conn)
+    df_0 = sqlio.read_sql_query(f"SELECT * FROM sandbox.gps_{query_aux} WHERE elevation != 0 AND speed = 0 AND EXTRACT(HOUR FROM time) = 24 ORDER BY time", conn)
 
     # Preparación de datos para el gráfico
     x = df['latitude'].tolist()

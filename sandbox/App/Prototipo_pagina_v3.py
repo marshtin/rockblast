@@ -1,5 +1,5 @@
 import dash
-from dash import dcc, html, callback, Output, Input, ctx
+from dash import dcc, html, callback, Output, Input, ctx, State
 import pandas as pd
 import pandas.io.sql as sqlio
 import plotly.graph_objs as go
@@ -44,8 +44,8 @@ def get_fleet_data_by_type(conn, type_name):
     if conn is None:
         raise Exception("Failed to connect to the database. Please check your configuration.")
     
-    query_with_speed = f"SELECT * FROM sandbox.fleet WHERE type_name = '{type_name}' AND elevation != 0 AND speed > 0 AND EXTRACT(HOUR FROM time) = 24 ORDER BY time"
-    query_without_speed = f"SELECT * FROM sandbox.fleet WHERE type_name = '{type_name}' AND elevation != 0 AND speed = 0 AND EXTRACT(HOUR FROM time) = 24 ORDER BY time"
+    query_with_speed = f"SELECT * FROM sandbox.fleet WHERE type_name = '{type_name}' AND elevation != 0 AND speed > 0"
+    query_without_speed = f"SELECT * FROM sandbox.fleet WHERE type_name = '{type_name}' AND elevation != 0 AND speed = 0"
     
     df_with_speed = sqlio.read_sql_query(query_with_speed, conn)
     df_without_speed = sqlio.read_sql_query(query_without_speed, conn)
@@ -54,8 +54,8 @@ def get_fleet_data_by_type(conn, type_name):
 
 # Visualizar los datos con Plotly
 def visualize_name_data(query_aux):
-    df = sqlio.read_sql_query(f"SELECT * FROM sandbox.gps_{query_aux} WHERE elevation != 0 AND speed > 0 AND EXTRACT(HOUR FROM time) = 24 ORDER BY time", conn)
-    df_0 = sqlio.read_sql_query(f"SELECT * FROM sandbox.gps_{query_aux} WHERE elevation != 0 AND speed = 0 AND EXTRACT(HOUR FROM time) = 24 ORDER BY time", conn)
+    df = sqlio.read_sql_query(f"SELECT * FROM sandbox.gps_{query_aux} WHERE elevation != 0 AND speed > 0", conn)
+    df_0 = sqlio.read_sql_query(f"SELECT * FROM sandbox.gps_{query_aux} WHERE elevation != 0 AND speed = 0", conn)
 
     # Preparación de datos para el gráfico
     x = df['latitude'].tolist()
@@ -215,6 +215,7 @@ def visualize_fleet_data_combined(df_with_speed_list, df_without_speed_list, typ
                 color_index = (color_index + 1) % len(colors)  # Avanzar al siguiente color en la escala
 
     traces = []
+    traces2d = []
 
     # Crear trazas para datos con velocidad mayor a 0
     for name, data in grouped_data_with_speed.items():
@@ -231,6 +232,19 @@ def visualize_fleet_data_combined(df_with_speed_list, df_without_speed_list, typ
             name=f'{name} - Con velocidad (Type: {type_name})'
         )
         traces.append(trace)
+        trace2d = go.Scatter(
+            x=data['x'],
+            y=data['y'],
+            mode='markers',
+            marker=dict(
+                size=5,
+                color=data['color'],
+                opacity=0.8
+            ),
+            name=f'{name} - Con velocidad (Type: {type_name})'
+        )
+        traces2d.append(trace2d)
+
 
     # Crear trazas para datos con velocidad igual a 0
     for name, data in grouped_data_without_speed.items():
@@ -247,6 +261,18 @@ def visualize_fleet_data_combined(df_with_speed_list, df_without_speed_list, typ
             name=f'{name} - Sin velocidad (Type: {type_name})'
         )
         traces.append(trace)
+        trace2d = go.Scatter(
+            x=data['x'],
+            y=data['y'],
+            mode='markers',
+            marker=dict(
+                size=5,
+                color=data['color'],
+                opacity=0.8
+            ),
+            name=f'{name} - Sin velocidad (Type: {type_name})'
+        )
+        traces2d.append(trace2d)
 
     if traces:
         layout = go.Layout(
@@ -257,12 +283,19 @@ def visualize_fleet_data_combined(df_with_speed_list, df_without_speed_list, typ
                 zaxis=dict(title='Elevación'),
             )
         )
+        
+        layout2 = go.Layout(
+                        title='Velocidades en camino (2D)',
+                        xaxis=dict(title='Latitud'),
+                        yaxis=dict(title='Longitud'),
+                        font=dict(family='Noto Sans, sans-serif'))
 
         fig = go.Figure(data=traces, layout=layout)
-        return fig
+        fig2 = go.Figure(data=traces2d, layout=layout2)
     else:
         fig = {}
-        return fig
+        fig2 = {}
+    return fig, fig2
 
 app.layout = html.Div([
     # Incluir Google Fonts
@@ -352,9 +385,12 @@ app.layout = html.Div([
     Output(component_id='2d-scatter-plot', component_property='figure'),
     Input(component_id='save-button-1', component_property='n_clicks'),
     Input(component_id='save-button-2', component_property='n_clicks'),
-    Input(component_id='save-button-3', component_property='n_clicks')
+    Input(component_id='save-button-3', component_property='n_clicks'),
+    State('dropdown-1', 'value'),
+    State('dropdown-2', 'value'),
+    State('flota-personalizada', 'value')
 )
-def update_graphs(btn1, btn2, btn3):
+def update_graphs(btn1, btn2, btn3, dd1, dd2, fp,):
     fig = go.Figure()
     fig2 = go.Figure()
     changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0] if not None else 'No clicks yet'
@@ -363,19 +399,21 @@ def update_graphs(btn1, btn2, btn3):
     conn = connect()
 
     if 'save-button-1' in changed_id:
-        query_aux = 'c07'
+        query_aux = dd1.lower().strip()
+        print(query_aux)
         fig, fig2 = visualize_name_data(query_aux)
     elif 'save-button-2' in changed_id:
-        type_name = 'CAT 797 F'
+        type_name = str(dd2).strip()
+        print(type_name)
         df_with_speed, df_without_speed = get_fleet_data_by_type(conn, type_name)
-        fig = visualize_fleet_data_combined([df_with_speed], [df_without_speed], type_name)
-        fig2 = {}
+        fig, fig2 = visualize_fleet_data_combined([df_with_speed], [df_without_speed], type_name)
     elif 'save-button-3' in changed_id:
-        query_aux = 'c56'
+        fleet = fp
         fig = {}
         fig2 = {}
     else:
-        query_aux = 'empty'
+        fig = {}
+        fig2 = {}
     return fig, fig2
 
 if __name__ == '__main__':

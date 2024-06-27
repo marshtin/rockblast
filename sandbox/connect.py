@@ -9,14 +9,14 @@ def connect():
 	conn = None
 	try: 
 		# read connection parameters 
-		params = config()
+		#params = config()
 
-		#params = {"host": "rockblast-g4.cfwy4giwk9t5.sa-east-1.rds.amazonaws.com",
-                #          "database": "datasources",
-                #          "port": "5432",
-                #          "user": "uss_tei_g4",
-                #          "password": "uss_tei_g4"
-                #          }
+		params = {"host": "rockblast-g4.cfwy4giwk9t5.sa-east-1.rds.amazonaws.com",
+                          "database": "datasources",
+                          "port": "5432",
+                          "user": "uss_tei_g4",
+                          "password": "uss_tei_g4"
+                          }
 
 		# connect to the PostgreSQL server 
 		print('Connecting to the PostgreSQL database...') 

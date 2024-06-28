@@ -55,6 +55,26 @@ def get_fleet_data_by_type(conn, type_name):
     
     return df_with_speed, df_without_speed
 
+# Obtener datos de la tabla fleet según el equipment_id y las dos consultas
+def get_fleet_data_by_name(conn, custom_list):
+    if conn is None:
+        raise Exception("Failed to connect to the database. Please check your configuration.")
+    query_aux = ''
+    for id in custom_list:
+        if custom_list.index(id) == 0:
+            query_aux += f"'{id}'"
+        else:
+            query_aux += f" OR name = '{id}'"
+    query_with_speed = f"SELECT * FROM sandbox.fleet WHERE name = {query_aux} AND elevation != 0 AND speed > 0"
+    query_without_speed = f"SELECT * FROM sandbox.fleet WHERE name = {query_aux} AND elevation != 0 AND speed = 0"
+
+    print(query_with_speed)
+    
+    df_with_speed = sqlio.read_sql_query(query_with_speed, conn)
+    df_without_speed = sqlio.read_sql_query(query_without_speed, conn)
+    
+    return df_with_speed, df_without_speed
+
 # Visualizar los datos con Plotly
 def visualize_name_data(query_aux):
     df = sqlio.read_sql_query(f"SELECT * FROM sandbox.fleet WHERE name = '{query_aux}' AND elevation != 0 AND speed > 0", conn)
@@ -435,9 +455,9 @@ def update_graphs(btn1, btn2, btn3, dd1, dd2, fp,):
         fig, fig2, df_velocidad, df_velocidad_0  = visualize_fleet_data_combined([df_with_speed], [df_without_speed], type_name)
     elif 'save-button-3' in changed_id:
         fleet = custom_list
-        print(fleet)
-        fig = {}
-        fig2 = {}
+        type_name = 'Flota personalizada'
+        df_with_speed, df_without_speed = get_fleet_data_by_name(conn, fleet)
+        fig, fig2, df_velocidad, df_velocidad_0 = visualize_fleet_data_combined([df_without_speed], [df_without_speed], type_name)
     else:
         fig = {}
         fig2 = {}

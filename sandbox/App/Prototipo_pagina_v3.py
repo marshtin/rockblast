@@ -379,8 +379,10 @@ app.layout = html.Div([
     html.Div([
         
     
-        html.Button("Download CSV", id="btn_csv",style={'font-size': '20px', 'padding': '15px 30px', 'margin': '10px', 'font-family': 'Noto Sans, sans-serif'}),
+        html.Button("Descargar CSV", id="btn_csv",style={'font-size': '20px', 'padding': '15px 30px', 'margin': '10px', 'font-family': 'Noto Sans, sans-serif'}),
         dcc.Download(id="download-dataframe-csv"),
+        html.Button("Descargar Excel", id="btn_xlsx",style={'font-size': '20px', 'padding': '15px 30px', 'margin': '10px', 'font-family': 'Noto Sans, sans-serif'}),
+        dcc.Download(id="download-dataframe-xlsx"),
     
     ], style={'display': 'flex', 'justify-content': 'center', 'margin-top': '20px'})
 
@@ -430,17 +432,30 @@ def update_graphs(btn1, btn2, btn3, dd1, dd2, fp,):
     return fig, fig2
 #################################
 
-
+### BOTON CSV
 @callback(
     
     Output("download-dataframe-csv", "data"),
     Input("btn_csv", "n_clicks"),
     prevent_initial_call=True,
 )
-def func(n_clicks):
-    
-    return dcc.send_data_frame(df_velocidad_0.to_csv, "CONVELOCIDAD.csv")
 
+
+def func(n_clicks):
+    df_combined_csv = pd.concat([df_velocidad, df_velocidad_0], axis=0)
+    print(df_combined_csv.head())
+    return dcc.send_data_frame(df_combined_csv.to_csv, "Velocidad.csv")
+
+
+@callback(
+    Output("download-dataframe-xlsx", "data"),
+    Input("btn_xlsx", "n_clicks"),
+    prevent_initial_call=True,
+)
+def func(n_clicks):
+    df_combined_excel = pd.concat([df_velocidad, df_velocidad_0], axis=0)
+    print(df_combined_excel.head())
+    return dcc.send_data_frame(df_combined_excel.to_excel, "Velocidad.xlsx", sheet_name="Sheet_name_1")
 
 
 

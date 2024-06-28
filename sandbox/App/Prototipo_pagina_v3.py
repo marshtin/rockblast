@@ -54,8 +54,8 @@ def get_fleet_data_by_type(conn, type_name):
 
 # Visualizar los datos con Plotly
 def visualize_name_data(query_aux):
-    df = sqlio.read_sql_query(f"SELECT * FROM sandbox.gps_{query_aux} WHERE elevation != 0 AND speed > 0", conn)
-    df_0 = sqlio.read_sql_query(f"SELECT * FROM sandbox.gps_{query_aux} WHERE elevation != 0 AND speed = 0", conn)
+    df = sqlio.read_sql_query(f"SELECT * FROM sandbox.fleet WHERE name = '{query_aux}' AND elevation != 0 AND speed > 0", conn)
+    df_0 = sqlio.read_sql_query(f"SELECT * FROM sandbox.fleet WHERE name = '{query_aux}' AND elevation != 0 AND speed = 0", conn)
 
     # Preparación de datos para el gráfico
     x = df['latitude'].tolist()
@@ -295,6 +295,7 @@ def visualize_fleet_data_combined(df_with_speed_list, df_without_speed_list, typ
     else:
         fig = {}
         fig2 = {}
+    #return the figs
     return fig, fig2
 
 app.layout = html.Div([
@@ -399,7 +400,7 @@ def update_graphs(btn1, btn2, btn3, dd1, dd2, fp,):
     conn = connect()
 
     if 'save-button-1' in changed_id:
-        query_aux = dd1.lower().strip()
+        query_aux = dd1.strip()
         print(query_aux)
         fig, fig2 = visualize_name_data(query_aux)
     elif 'save-button-2' in changed_id:

@@ -143,7 +143,7 @@ def visualize_name_data(query_aux):
                     )
                 }
     # Cerrar la conexión
-    return fig, fig2
+    return fig, fig2, df, df_0
 
 def visualize_fleet_data_combined(df_with_speed_list, df_without_speed_list, type_name):
     grouped_data_with_speed = {}
@@ -414,7 +414,7 @@ def update_graphs(btn1, btn2, btn3, dd1, dd2, fp,):
     if 'save-button-1' in changed_id:
         query_aux = dd1.lower().strip()
         print(query_aux)
-        fig, fig2 = visualize_name_data(query_aux)
+        fig, fig2, df_velocidad, df_velocidad_0 = visualize_name_data(query_aux)
     elif 'save-button-2' in changed_id:
         type_name = str(dd2).strip()
         print(type_name)

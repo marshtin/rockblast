@@ -15,6 +15,11 @@ pd.set_option('display.width', None)
 app = dash.Dash(__name__)
 conn = connect()
 
+df_velocidad = pd.DataFrame()
+df_velocidad_0 = pd.DataFrame()
+
+
+
 #Lista nombre de camiones
 # Obtener los nombres de tipo disponibles en la base de datos (ahora será 'name' en lugar de 'type_name')
 def get_distinct_names(conn):
@@ -138,7 +143,7 @@ def visualize_name_data(query_aux):
                     )
                 }
     # Cerrar la conexión
-    return fig, fig2
+    return fig, fig2, df, df_0
 
 def visualize_fleet_data_combined(df_with_speed_list, df_without_speed_list, type_name):
     grouped_data_with_speed = {}
@@ -295,8 +300,8 @@ def visualize_fleet_data_combined(df_with_speed_list, df_without_speed_list, typ
     else:
         fig = {}
         fig2 = {}
-    #return the figs
-    return fig, fig2
+        
+    return fig, fig2 , df_with_speed, df_without_speed
 
 app.layout = html.Div([
     # Incluir Google Fonts
@@ -373,9 +378,13 @@ app.layout = html.Div([
     ], style={'display': 'flex'}),
 
     html.Div([
-        html.Button('Velocidad En Camino', id='button-1', style={'font-size': '20px', 'padding': '15px 30px', 'margin': '10px', 'font-family': 'Noto Sans, sans-serif'}),
-        html.Button('Velocidad 0', id='button-2', style={'font-size': '20px', 'padding': '15px 30px', 'margin': '10px', 'font-family': 'Noto Sans, sans-serif'}),
-        html.Button('Limpiar Filtros', id='button-3', style={'font-size': '20px', 'padding': '15px 30px', 'margin': '10px', 'font-family': 'Noto Sans, sans-serif'})
+        
+    
+        html.Button("Descargar CSV", id="btn_csv",style={'font-size': '20px', 'padding': '15px 30px', 'margin': '10px', 'font-family': 'Noto Sans, sans-serif'}),
+        dcc.Download(id="download-dataframe-csv"),
+        html.Button("Descargar Excel", id="btn_xlsx",style={'font-size': '20px', 'padding': '15px 30px', 'margin': '10px', 'font-family': 'Noto Sans, sans-serif'}),
+        dcc.Download(id="download-dataframe-xlsx"),
+    
     ], style={'display': 'flex', 'justify-content': 'center', 'margin-top': '20px'})
 
 
@@ -392,6 +401,10 @@ app.layout = html.Div([
     State('flota-personalizada', 'value')
 )
 def update_graphs(btn1, btn2, btn3, dd1, dd2, fp,):
+
+    global df_velocidad, df_velocidad_0
+
+
     fig = go.Figure()
     fig2 = go.Figure()
     changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0] if not None else 'No clicks yet'
@@ -402,12 +415,14 @@ def update_graphs(btn1, btn2, btn3, dd1, dd2, fp,):
     if 'save-button-1' in changed_id:
         query_aux = dd1.strip()
         print(query_aux)
-        fig, fig2 = visualize_name_data(query_aux)
+        fig, fig2, df_velocidad, df_velocidad_0 = visualize_name_data(query_aux)
     elif 'save-button-2' in changed_id:
         type_name = str(dd2).strip()
         print(type_name)
         df_with_speed, df_without_speed = get_fleet_data_by_type(conn, type_name)
-        fig, fig2 = visualize_fleet_data_combined([df_with_speed], [df_without_speed], type_name)
+        
+        fig, fig2, df_velocidad, df_velocidad_0  = visualize_fleet_data_combined([df_with_speed], [df_without_speed], type_name)
+        
     elif 'save-button-3' in changed_id:
         fleet = fp
         fig = {}
@@ -416,9 +431,38 @@ def update_graphs(btn1, btn2, btn3, dd1, dd2, fp,):
         fig = {}
         fig2 = {}
     return fig, fig2
+#################################
+
+### BOTON CSV
+@callback(
+    
+    Output("download-dataframe-csv", "data"),
+    Input("btn_csv", "n_clicks"),
+    prevent_initial_call=True,
+)
+
+
+def func(n_clicks):
+    df_combined_csv = pd.concat([df_velocidad, df_velocidad_0], axis=0)
+    print(df_combined_csv.head())
+    return dcc.send_data_frame(df_combined_csv.to_csv, "Velocidad.csv")
+
+
+@callback(
+    Output("download-dataframe-xlsx", "data"),
+    Input("btn_xlsx", "n_clicks"),
+    prevent_initial_call=True,
+)
+def func(n_clicks):
+    df_combined_excel = pd.concat([df_velocidad, df_velocidad_0], axis=0)
+    print(df_combined_excel.head())
+    return dcc.send_data_frame(df_combined_excel.to_excel, "Velocidad.xlsx", sheet_name="Sheet_name_1")
+
+
 
 if __name__ == '__main__':
     conn = connect()
+   
     if conn is None:
         exit(1)
     app.run_server(debug=False)

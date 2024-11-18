@@ -102,7 +102,7 @@ main_layout = html.Div(
                                     id="tiff-dropdown",
                                     options=[
                                         {"label": "REE.tif", "value": "REE"},
-                                        {"label": "REES.tif", "value": "RES"}
+                                        {"label": "RES.tif", "value": "RES"}
                                     ],
                                     placeholder="Seleccionar TIFF",
                                     className="dccDropdown"

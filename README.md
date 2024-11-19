@@ -1,3 +1,5 @@
-Al clonar el repositorio, cargar RES.tif y REE.tif (con los mismos nombres) en App>data
-
-Para ejecutar la aplicación -> Ejecutar app.py
+-Paso 1: Clonar el repositorio
+-Paso 2: Cargar tifs con los siguientes nombres: RES.tif, REE.tif en App>data
+-Paso 3: Reiniciar el editor de código que ud. utiliza para que se actualice el directorio data.
+-Paso 4: Iniciar editor de código.
+-Paso 5: Ejecutar App/app.py

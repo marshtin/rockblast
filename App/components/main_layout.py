@@ -75,53 +75,51 @@ main_layout = html.Div(
             ]
         ),
     
-        # Contenedor principal del mapa y filtros
+        # Encabezado con filtros y Operadores
         html.Div(
-            className="map-container",
+            className="header",
             children=[
-                # Filtros y operadores
                 html.Div(
-                    className="header",
+                    className="filters",
                     children=[
+                        html.H2("Filtros"),
+                        dcc.Checklist(
+                            options=[{"label": "Flota", "value": "fleet"}],
+                            id="fleet-checklist",
+                            className="dccChecklist"
+                        ),
+                        dcc.Checklist(
+                            options=[{"label": "ID", "value": "id"}],
+                            id="id-checklist",
+                            className="dccChecklist"
+                        ),
+                        dcc.Input(type="text", placeholder="Buscar",className="dccInput"),
+                        html.Button("+", className="add-button"),
+                        dcc.Dropdown(
+                            id="tiff-dropdown",
+                            options=[
+                                {"label": "REE.tif", "value": "REE"},
+                                {"label": "RES.tif", "value": "RES"}
+                            ],
+                            placeholder="Seleccionar TIFF",
+                            className="dccDropdown"
+                        ),
                         html.Div(
-                            className="filters",
+                            className="operators",
                             children=[
-                                html.H2("Filtros"),
-                                dcc.Checklist(
-                                    options=[{"label": "Flota", "value": "fleet"}],
-                                    id="fleet-checklist",
-                                    className="dccChecklist"
-                                ),
-                                dcc.Checklist(
-                                    options=[{"label": "ID", "value": "id"}],
-                                    id="id-checklist",
-                                    className="dccChecklist"
-                                ),
-                                dcc.Input(type="text", placeholder="Buscar",className="dccInput"),
-                                html.Button("+", className="add-button"),
-                                dcc.Dropdown(
-                                    id="tiff-dropdown",
-                                    options=[
-                                        {"label": "REE.tif", "value": "REE"},
-                                        {"label": "RES.tif", "value": "RES"}
-                                    ],
-                                    placeholder="Seleccionar TIFF",
-                                    className="dccDropdown"
-                                ),
-                                html.Div(
-                                    className="operators",
-                                    children=[
-                                        html.H2("Reportes"),
-                                        dcc.Link("Tabla de Operadores", href="/tabla-operadores", className="redirection"),
-                                        dcc.Link("Generar Reporte", href="/reporte", className="redirection")
-                                    ]
-                                )
+                                html.H2("Reportes"),
+                                dcc.Link("Tabla de Operadores", href="/tabla-operadores", className="redirection"),
+                                dcc.Link("Generar Reporte", href="/reporte", className="redirection")
                             ]
                         )
                     ]
-                ),
-            
-                #Imagen del mapa
+                )
+            ]
+        ),
+        # Contenedor del mapa
+        html.Div(
+            className="map-container",
+            children=[
                 html.Img(id="map-image", className="map-image", src="")
             ]
         )

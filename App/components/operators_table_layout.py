@@ -4,10 +4,19 @@ tabla_operadores_layout = html.Div(
     children=[
         # Encabezado de la página de tabla de operadores
         html.Div(
-            className="operators-header",
+            className="operators-tab-header",
             children=[
+                html.Div(
+                    className="redirection",
+                    children=html.A(
+                        href="/",
+                        children=[
+                            html.Img(src="assets/pngs/back.png", alt="icono de regreso"),
+                            "Volver al Dashboard"
+                        ]
+                    )
+                ),
                 html.H2("Tabla de Operadores"),
-                html.A("Volver a la página principal", href="/")
             ]
         ),
         

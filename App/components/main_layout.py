@@ -86,6 +86,7 @@ main_layout = html.Div(
                         html.Div(
                             className="filters",
                             children=[
+                                html.H2("Filtros"),
                                 dcc.Checklist(
                                     options=[{"label": "Flota", "value": "fleet"}],
                                     id="fleet-checklist",
@@ -106,21 +107,22 @@ main_layout = html.Div(
                                     ],
                                     placeholder="Seleccionar TIFF",
                                     className="dccDropdown"
+                                ),
+                                html.Div(
+                                    className="operators",
+                                    children=[
+                                        html.H2("Reportes"),
+                                        dcc.Link("Tabla de Operadores", href="/tabla-operadores", className="redirection"),
+                                        dcc.Link("Generar Reporte", href="/reporte", className="redirection")
+                                    ]
                                 )
-                            ]
-                        ),
-                        html.Div(
-                            className="operators",
-                            children=[
-                                dcc.Link("Tabla de Operadores", href="/tabla-operadores", className="redirection"),
-                                dcc.Link("Generar Reporte", href="/reporte", className="redirection")
                             ]
                         )
                     ]
                 ),
             
-                 #Imagen del mapa
-                 html.Img(id="map-image", className="map-image", src="")
+                #Imagen del mapa
+                html.Img(id="map-image", className="map-image", src="")
             ]
         )
     ]

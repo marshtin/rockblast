@@ -1,4 +1,14 @@
 from dash import dcc, html
+import geopandas as gpd
+import plotly.graph_objs as go
+from rasterio.plot import reshape_as_image
+
+
+
+
+
+points = gpd.read_file("Prueba1.geojson")
+
 
 main_layout = html.Div(
     className="container",
@@ -120,6 +130,38 @@ main_layout = html.Div(
         html.Div(
             className="map-container",
             children=[
+                dcc.Graph(
+        id='map1',
+        figure={
+            'data': [
+                go.Scatter(
+                    x=points.geometry.x,
+                    y=points.geometry.y,
+                    mode='markers',
+                    marker=dict(size=6, color='blue'),
+                    name='Puntos'
+                )
+            ],
+            'layout': go.Layout(
+                title='TIFF con Puntos - Archivo 1',
+                images=[{
+                    'source': f"data:image/png;base64,{tiff_base64_1}",
+                    'xref': "x",
+                    'yref': "y",
+                    'x': extent_1[0],
+                    'y': extent_1[3],
+                    'sizex': extent_1[1] - extent_1[0],
+                    'sizey': extent_1[3] - extent_1[2],
+                    'sizing': "stretch",
+                    'layer': "below"
+                }],
+                xaxis=dict(range=[extent_1[0], extent_1[1]], visible=False, scaleanchor="y", scaleratio=1),
+                yaxis=dict(range=[extent_1[2], extent_1[3]], visible=False),
+                showlegend=True
+            )
+        },
+        style={'width': '100vw', 'height': '100vh'}
+    ),
                 html.Img(id="map-image", className="map-image", src="")
             ]
         )

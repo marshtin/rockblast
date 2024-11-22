@@ -37,7 +37,7 @@ def fetch_gps_data_to_geojson(output_file):
         gdf = gpd.GeoDataFrame(df, geometry=geometry)
 
         # Define el sistema de coordenadas como EPSG:3857 (ya está en este sistema)
-        gdf.set_crs(epsg=3857, inplace=True)
+        gdf.set_crs(epsg=4326, inplace=True)
 
         # Guarda el GeoDataFrame directamente como GeoJSON
         gdf.to_file(output_file, driver="GeoJSON")

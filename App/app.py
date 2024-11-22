@@ -2,7 +2,7 @@ from dash import Dash
 from components import layout  # Importa el layout principal
 from callbacks.routes_callback import register_routes_callbacks  # Callbacks de rutas
 from callbacks.dropdown_callbacks import register_dropdown_callbacks  # Callbacks del dropdown
-from database.queries import fetch_gps_data, fetch_database_version
+from database.queries import fetch_gps_data_to_geojson, fetch_database_version
 from database.connection import close_conn
 
 # Obtén la versión de la base de datos
@@ -10,7 +10,7 @@ db_version = fetch_database_version()
 print(f"Database version: {db_version}")
 
 # Obtén los datos de GPS
-gps_data = fetch_gps_data()
+gps_data = fetch_gps_data_to_geojson("Prueba.geojson")
 print(f"Datos de gps: {gps_data}")
 
 app = Dash(__name__, suppress_callback_exceptions=True)

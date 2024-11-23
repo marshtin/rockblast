@@ -20,9 +20,9 @@ def transformar_tiff(tiff_path):
     return tiff_base64, extent
 
 
-# ---------------TRANSFORMACIÓN DE TIFF A PNG PARA LOS GRAFICOS------------------
+""" # ---------------TRANSFORMACIÓN DE TIFF A PNG PARA LOS GRAFICOS------------------
 def normalize_to_8bit(data):
-    """Normaliza los valores de una matriz a un rango de 0 a 255 para imágenes de 8 bits."""
+    #Normaliza los valores de una matriz a un rango de 0 a 255 para imágenes de 8 bits.
     data = data.astype(np.float32)
     data = (data - data.min()) / (data.max() - data.min()) * 255
     return data.astype(np.uint8)
@@ -41,4 +41,4 @@ with rasterio.open('REE.tif') as src:
     buffered_1 = BytesIO()
     pil_img_1.save(buffered_1, format="PNG")
     tiff_base64_1 = base64.b64encode(buffered_1.getvalue()).decode()
-
+ """

@@ -5,7 +5,13 @@ from rasterio.plot import reshape_as_image
 from database.queries import fetch_gps_data_to_geojson
 from utils.load_tiff import transformar_tiff
 
-
+# Lista de alertas (camiones con velocidad baja)
+alertas = [
+    "Camión 1 - Hola", "Camión 2 - Cómo", "Camión 3 - Estás", 
+    "Camión 4 - Bajo", "Camión 5 - Bajo", "Camión 6 - Bajo", 
+    "Camión 7 - Bajo", "Camión 8 - Bajo", "Camión 9 - Bajo", 
+    "Camión 10 - Bajo", "Camión 11 - Bajo", "Camión 12 - Bajo"
+]
 
 main_layout = html.Div(
     className="container",
@@ -23,52 +29,8 @@ main_layout = html.Div(
                     children=[
                         html.Div(className="alert-item", children=[
                             html.Img(src="assets/pngs/icono_alerta.png", alt="Icono de alerta"),
-                            html.Span("Camión 1 - Bajo")
-                        ]),
-                        html.Div(className="alert-item", children=[
-                            html.Img(src="assets/pngs/icono_alerta.png", alt="Icono de alerta"),
-                            html.Span("Camión 2 - Bajo")
-                        ]),
-                        html.Div(className="alert-item", children=[
-                            html.Img(src="assets/pngs/icono_alerta.png", alt="Icono de alerta"),
-                            html.Span("Camión 3 - Bajo")
-                        ]),
-                        html.Div(className="alert-item", children=[
-                            html.Img(src="assets/pngs/icono_alerta.png", alt="Icono de alerta"),
-                            html.Span("Camión 4 - Bajo")
-                        ]),
-                        html.Div(className="alert-item", children=[
-                            html.Img(src="assets/pngs/icono_alerta.png", alt="Icono de alerta"),
-                            html.Span("Camión 5 - Bajo")
-                        ]),
-                        html.Div(className="alert-item", children=[
-                            html.Img(src="assets/pngs/icono_alerta.png", alt="Icono de alerta"),
-                            html.Span("Camión 6 - Bajo")
-                        ]),
-                        html.Div(className="alert-item", children=[
-                            html.Img(src="assets/pngs/icono_alerta.png", alt="Icono de alerta"),
-                            html.Span("Camión 7 - Bajo")
-                        ]),
-                        html.Div(className="alert-item", children=[
-                            html.Img(src="assets/pngs/icono_alerta.png", alt="Icono de alerta"),
-                            html.Span("Camión 8 - Bajo")
-                        ]),
-                        html.Div(className="alert-item", children=[
-                            html.Img(src="assets/pngs/icono_alerta.png", alt="Icono de alerta"),
-                            html.Span("Camión 9 - Bajo")
-                        ]),
-                        html.Div(className="alert-item", children=[
-                            html.Img(src="assets/pngs/icono_alerta.png", alt="Icono de alerta"),
-                            html.Span("Camión 10 - Bajo")
-                        ]),
-                        html.Div(className="alert-item", children=[
-                            html.Img(src="assets/pngs/icono_alerta.png", alt="Icono de alerta"),
-                            html.Span("Camión 11 - Bajo")
-                        ]),
-                        html.Div(className="alert-item", children=[
-                            html.Img(src="assets/pngs/icono_alerta.png", alt="Icono de alerta"),
-                            html.Span("Camión 12 - Bajo")
-                        ])
+                            html.Span(alerta)
+                        ]) for alerta in alertas
                     ]
                 ),
                 # Botones debajo del contenedor de alertas

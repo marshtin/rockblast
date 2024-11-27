@@ -8,10 +8,11 @@ def register_dropdown_callbacks(app):
     @app.callback(
         Output("map-image", "figure"),
         [Input("tiff-dropdown", "value"),
+         Input("camion-dropdown", "value"),  # Añadir el dropdown de camión
          Input("add-button", "n_clicks")],
         [State("map-image", "figure")]
     )
-    def update_map(selected_tiff, n_clicks, current_figure):
+    def update_map(selected_tiff, selected_camion, n_clicks, current_figure):
         # Verificar cuál de los inputs disparó el callback
         ctx = dash.callback_context
 
@@ -54,21 +55,24 @@ def register_dropdown_callbacks(app):
         # Si el desencadenante fue el botón "Agregar Puntos"
         if trigger == "add-button" and n_clicks:
             # Si ya se tiene un gráfico con un TIFF y se agregan puntos, solo se actualizan los puntos
-            x_query, y_query = visualizename_data()
-            # Verificar si los datos de los puntos son válidos
-            if x_query and y_query:
-                points = go.Scatter(
-                    x=x_query,
-                    y=y_query,
-                    mode='markers',
-                    marker=dict(size=6, color='blue'),
-                    name='Puntos'
-                )
+            if selected_camion:  # Verifica si se seleccionó un camión
+                # Llamar a visualizename_data con el camión seleccionado
+                x_query, y_query = visualizename_data(selected_camion)  # Pasar el camión seleccionado
 
-                # Agregar los puntos a los datos de la figura actual
-                current_data = current_figure.get('data', [])
-                current_data.append(points)
-                current_figure['data'] = current_data
+                # Verificar si los datos de los puntos son válidos
+                if x_query and y_query:
+                    points = go.Scatter(
+                        x=x_query,
+                        y=y_query,
+                        mode='markers',
+                        marker=dict(size=6, color='blue'),
+                        name=f'Puntos Camión {selected_camion}'  # Nombre del camión en la leyenda
+                    )
+
+                    # Agregar los puntos a los datos de la figura actual
+                    current_data = current_figure.get('data', [])
+                    current_data.append(points)
+                    current_figure['data'] = current_data
 
             # Retornar la figura con puntos agregados
             return current_figure

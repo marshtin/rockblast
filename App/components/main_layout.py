@@ -2,7 +2,6 @@ from dash import dcc, html
 import geopandas as gpd
 import plotly.graph_objs as go
 from rasterio.plot import reshape_as_image
-from database.queries import fetch_gps_data_to_geojson
 from utils.load_tiff import transformar_tiff
 
 # Lista de alertas (camiones con velocidad baja)
@@ -11,6 +10,11 @@ alertas = [
     "Camión 4 - Bajo", "Camión 5 - Bajo", "Camión 6 - Bajo", 
     "Camión 7 - Bajo", "Camión 8 - Bajo", "Camión 9 - Bajo", 
     "Camión 10 - Bajo", "Camión 11 - Bajo", "Camión 12 - Bajo"
+]
+
+camiones = [
+    "gps_c07", "gps_c130", "gps_c15", "gps_c17", 
+    "gps_c37", "gps_c49", "gps_c56"
 ]
 
 main_layout = html.Div(
@@ -62,7 +66,15 @@ main_layout = html.Div(
                             id="id-checklist",
                             className="dccChecklist"
                         ),
-                        dcc.Input(type="text", placeholder="Buscar",className="dccInput"),
+                        dcc.Dropdown(
+                            id="camion-dropdown",
+                            options=[
+                                {"label": camion, "value": camion}
+                                for camion in camiones
+                            ],
+                            placeholder="Seleccionar Camión",
+                            className="dccDropdown"
+                        ),
                         html.Button("+", className="add-button"),
                         dcc.Dropdown(
                             id="tiff-dropdown",

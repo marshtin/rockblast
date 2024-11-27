@@ -2,12 +2,9 @@ from dash import dcc, html
 import geopandas as gpd
 import plotly.graph_objs as go
 from rasterio.plot import reshape_as_image
+from database.queries import fetch_gps_data_to_geojson
+from utils.load_tiff import transformar_tiff
 
-
-
-
-
-#points = gpd.read_file("Prueba1.geojson")
 
 
 main_layout = html.Div(
@@ -126,12 +123,27 @@ main_layout = html.Div(
                 )
             ]
         ),
-        # Contenedor del mapa
         html.Div(
-            className="map-container",
+        className="map-container",
             children=[
-                html.Img(id="map-image", className="map-image", src="")
+                dcc.Graph(
+                    id='map-image',
+                    config={'responsive': True},  # Asegura que sea responsivo
+                    style={'height': '100%', 'width': '100%'},  # Expande al tamaño del contenedor
+                    figure={
+                        'data': [],
+                        'layout': go.Layout(
+                            title='Visualización Inicial',
+                            xaxis=dict(visible=False),
+                            yaxis=dict(visible=False),
+                            margin=dict(l=0, r=0, t=0, b=0),  # Márgenes mínimos
+                            height=None,  # Usa todo el espacio disponible
+                            width=None
+                        )
+                    }
+                )
             ]
         )
     ]
 )
+

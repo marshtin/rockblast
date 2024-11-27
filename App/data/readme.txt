@@ -1,0 +1,1 @@
+En este repositorio, cargar REE.tif y RES.tif

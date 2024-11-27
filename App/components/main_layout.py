@@ -114,6 +114,7 @@ main_layout = html.Div(
                         html.Div(
                             className="operators",
                             children=[
+                                html.Button("Agregar Puntos", className="add-button", id="add-button"),
                                 html.H2("Reportes"),
                                 dcc.Link("Tabla de Operadores", href="/tabla-operadores", className="redirection"),
                                 dcc.Link("Generar Reporte", href="/reporte", className="redirection")

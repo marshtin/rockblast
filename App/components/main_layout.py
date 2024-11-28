@@ -93,6 +93,14 @@ main_layout = html.Div(
                                 dcc.Link("Tabla de Operadores", href="/tabla-operadores", className="redirection"),
                                 dcc.Link("Generar Reporte", href="/reporte", className="redirection")
                             ]
+                        ),
+                        html.Div(
+                            className="clusters",
+                            children=[
+                                html.Button("Generar clusters", className="cluster-button", id="cluster-button", n_clicks=0),
+                                html.Button('Ocultar/Mostrar', className="cluster-button", id='toggle-clusters-button', n_clicks=0),
+                                dcc.Store(id='clusters-visible', data=True)  # Store to keep track of clusters visibility
+                            ]
                         )
                     ]
                 )

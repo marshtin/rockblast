@@ -303,6 +303,22 @@ body, html {
     background-color: #2980b9;
 }
 
+/* Botón de clusters */
+.filters .cluster-button {
+    padding: 8px 12px;
+    margin-right: 20px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.filters .cluster-button:hover {
+    background-color: #2980b9;
+}
+
 /* Dropdown */
 .filters .dccDropdown {
     width: 200px;

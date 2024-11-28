@@ -80,9 +80,7 @@ def register_dropdown_callbacks(app):
                     )
 
                     # Agregar los puntos a los datos de la figura actual
-                    current_data = current_figure.data
-                    current_data.append(points)
-                    current_figure.data = current_data
+                    current_figure.add_trace(points)
 
             # Retornar la figura con puntos agregados
             return current_figure

@@ -5,9 +5,8 @@ from shapely.geometry import Point
 import pandas.io.sql as sqlio
 
 
-def visualizename_data(query_aux):
-    #Query de camion 7
-    #query = (f"SELECT time, latitude, longitude, elevation, speed FROM sandbox.gps_c07 ORDER BY time")
+def puntos_flota(query_aux):
+    #Convierte los puntos de flota en un dataframe 
     query2= (f"""SELECT time, latitude, longitude, elevation, speed 
         FROM sandbox.{query_aux} 
         WHERE time >= (
@@ -27,14 +26,13 @@ def visualizename_data(query_aux):
         x = df['longitude'].tolist()
         y = df['latitude'].tolist()
         #z = df['elevation'].tolist()
-        #s = df['speed'].tolist()
-        return x, y
+        s = df['speed'].tolist()
+        return x, y, s #retorna longitud, latitud y velocidad
     
     except Exception as e:
         print(f"Error al cargar datos al dataframe: {e}")
-        return False
+        return [],[],[] #Retorna listas vacías en caso de error
     finally:
         # Cierra la conexión a la base de datos
         if conn:
             conn.close()
-    

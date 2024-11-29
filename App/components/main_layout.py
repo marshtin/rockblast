@@ -1,8 +1,5 @@
 from dash import dcc, html
-import geopandas as gpd
 import plotly.graph_objs as go
-from rasterio.plot import reshape_as_image
-from utils.load_tiff import transformar_tiff
 
 # Lista de alertas (camiones con velocidad baja)
 alertas = [
@@ -13,7 +10,7 @@ alertas = [
 ]
 
 camiones = [
-    "gps_c07", "gps_c130", "gps_c15", "gps_c17", 
+    "gps_c07", "gps_c15", "gps_c17", 
     "gps_c37", "gps_c49", "gps_c56"
 ]
 
@@ -88,7 +85,9 @@ main_layout = html.Div(
                         html.Div(
                             className="operators",
                             children=[
-                                html.Button("Agregar Puntos", className="add-button", id="add-button"),
+                                html.Button("Agregar Puntos", className="add-button", id="add-map-points-button"),
+                                html.Button("Quitar Puntos", className="add-button", id="delete-map-points-button"),
+                                dcc.Store(id="points-cleared", data=False), #Indica si los puntos se han borrado recientemente
                                 html.H2("Reportes"),
                                 dcc.Link("Tabla de Operadores", href="/tabla-operadores", className="redirection"),
                                 dcc.Link("Generar Reporte", href="/reporte", className="redirection")

@@ -458,3 +458,39 @@ td:hover {
 tr:hover td {
     background-color: #ecf0f1;
 }
+
+
+/* Contenedor principal para las tablas */
+.table-section {
+    display: flex;
+    flex-wrap: wrap; /* Permite que las tablas pasen a la siguiente fila si no hay espacio */
+    justify-content: center; /* Centra las tablas horizontalmente */
+    align-items: flex-start; /* Alinea las tablas al inicio en la vertical */
+    gap: 20px; /* Espacio entre las tablas */
+    padding: 20px;
+    margin-top: 100px; /* Espacio para evitar superposición con el header */
+}
+
+/* Contenedor individual de cada tabla */
+.table-container {
+    flex: 0 1 calc(33% - 20px); /* Ocupa un tercio del ancho disponible menos el espacio del gap */
+    background-color: #ffffff; /* Fondo blanco para las tablas */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra suave */
+    padding: 20px;
+    min-width: 300px; /* Ancho mínimo para evitar que las tablas se encojan demasiado */
+}
+
+/* Ajustes responsivos */
+@media (max-width: 1024px) {
+    .table-container {
+        flex: 0 1 calc(50% - 20px); /* Ocupa la mitad del ancho disponible en pantallas más pequeñas */
+    }
+}
+
+@media (max-width: 768px) {
+    .table-container {
+        flex: 0 1 100%; /* Ocupa el 100% del ancho disponible en pantallas muy pequeñas */
+    }
+}
+

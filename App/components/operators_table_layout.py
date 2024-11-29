@@ -1,6 +1,7 @@
 from dash import dcc, html
 
 tabla_operadores_layout = html.Div(
+    className="table-section",  # Aplicar la clase principal para el contenedor de tablas
     children=[
         # Encabezado de la página de tabla de operadores
         html.Div(
@@ -17,14 +18,19 @@ tabla_operadores_layout = html.Div(
                     )
                 ),
                 html.H2("Tabla de Operadores"),
+                html.Button("Resumen de Operadores", className="add-button", id="add-operadores")
             ]
         ),
         
-        # Aquí las tablas de operadores (como ya lo tienes)
+        # Contenedor de las tablas
         html.Div(
-            className="tables-container",
+            className="tables-container",  # Clase para organizar las tablas
             children=[
-                # Tu código para las tablas de operadores
+                # Contenedor para las tablas dinámicas generadas por Dash
+                html.Div(
+                    id='table-container',  # Este ID se utiliza en el callback para insertar las tablas
+                    className="table-container"  # Clase individual para las tablas
+                )
             ]
         )
     ]

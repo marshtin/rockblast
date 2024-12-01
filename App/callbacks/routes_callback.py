@@ -2,6 +2,7 @@ from dash import html
 from dash.dependencies import Input, Output
 from components.main_layout import main_layout
 from components.operators_table_layout import tabla_operadores_layout
+from utils.load_tiff import save_cache
 
 def register_routes_callbacks(app):
     @app.callback(

@@ -7,7 +7,7 @@ def puntos_camion(query_aux):
     query_camion= (f"""SELECT time, latitude, longitude, elevation, speed 
         FROM sandbox.{query_aux} 
         WHERE time >= (
-            SELECT MAX(time) - INTERVAL '2 HOURS' 
+            SELECT MAX(time) - INTERVAL '4 HOURS' 
             FROM sandbox.{query_aux}
             )
         ORDER BY time;""")
@@ -61,7 +61,7 @@ def puntos_flota(query_aux):
     query_flota= (f"""SELECT time, latitude, longitude, elevation, speed 
         FROM sandbox.fleet 
         WHERE time >= (
-            SELECT MAX(time) - INTERVAL '2 HOURS' 
+            SELECT MAX(time) - INTERVAL '4 HOURS' 
             FROM sandbox.fleet
             )
         AND type_name = '{query_aux}'

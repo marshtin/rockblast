@@ -1,13 +1,10 @@
 import pandas as pd
 from database.connection import connect, close_conn
-import geopandas as gpd
-from shapely.geometry import Point
-import pandas.io.sql as sqlio
 
 
-def puntos_flota(query_aux):
-    #Convierte los puntos de flota en un dataframe 
-    query2= (f"""SELECT time, latitude, longitude, elevation, speed 
+def puntos_camion(query_aux):
+    #Convierte los puntos de camion en un dataframe 
+    query_camion= (f"""SELECT time, latitude, longitude, elevation, speed 
         FROM sandbox.{query_aux} 
         WHERE time >= (
             SELECT MAX(time) - INTERVAL '4 HOURS' 
@@ -20,7 +17,7 @@ def puntos_flota(query_aux):
         return False
     try:
         # Cargar los datos en un DataFrame
-        df = pd.read_sql_query(query2, conn)
+        df = pd.read_sql_query(query_camion, conn)
         df_1 = df[df['speed'] > 0]
 
         # Preparación de datos para el gráfico
@@ -36,7 +33,7 @@ def puntos_flota(query_aux):
         s_0 = df_0['speed'].tolist()
 
         return x, y, s, x_0, y_0, s_0, df #retorna longitud, latitud y velocidad
-    
+      
     except Exception as e:
         print(f"Error al cargar datos al dataframe: {e}")
         return [],[],[],[],[],[], pd.DataFrame() #Retorna listas vacías en caso de error
@@ -44,6 +41,75 @@ def puntos_flota(query_aux):
         # Cierra la conexión a la base de datos
         if conn:
             conn.close()
+
+def nombres_flota():
+    #Convierte los nombres de flota en un dataframe 
+    query_nombres_flota= (f"SELECT DISTINCT type_name FROM sandbox.fleet")
+    conn = connect()
+    if conn is None:
+        print("No se pudo establecer conexión con la base de datos.")
+        return False
+    try:
+        # Cargar los datos en un DataFrame
+        df_nombres_flota = pd.read_sql_query(query_nombres_flota, conn)
+        # Retorna df con nombres de flota
+        return df_nombres_flota['type_name'].tolist()
+
+    except Exception as e:
+        print(f"Error al cargar datos al dataframe: {e}")
+        return [] #Retorna lista vacía en caso de error
+    finally:
+        # Cierra la conexión a la base de datos
+        if conn:
+            conn.close()
+
+
+def puntos_flota(query_aux):
+    #Convierte los puntos de flota en un dataframe 
+    query_flota= (f"""SELECT time, latitude, longitude, elevation, speed 
+        FROM sandbox.fleet 
+        WHERE time >= (
+            SELECT MAX(time) - INTERVAL '4 HOURS' 
+            FROM sandbox.fleet
+            )
+        AND type_name = '{query_aux}'
+        ORDER BY time;""")
+    conn = connect()
+    if conn is None:
+        print("No se pudo establecer conexión con la base de datos.")
+        return False
+    try:
+        # Cargar los datos en un DataFrame
+        df_puntos_flota = pd.read_sql_query(query_flota, conn)
+        
+        # Preparación de datos para el gráfico
+        x = df_puntos_flota['longitude'].tolist()
+        y = df_puntos_flota['latitude'].tolist()
+        #z = df['elevation'].tolist()
+        s = df_puntos_flota['speed'].tolist()
+        return x, y, s #retorna longitud, latitud y velocidad
+    
+    except Exception as e:
+        print(f"Error al cargar datos al dataframe: {e}")
+        return [],[],[] #Retorna listas vacías en caso de error
+    finally:
+        # Cierra la conexión a la base de datos
+        if conn:
+            conn.close()
+
+# Query de filtro personalizado (en proceso)
+def get_fleet_data_by_name(conn, custom_list):
+    if conn is None:
+        raise Exception("Failed to connect to the database. Please check your configuration.")
+    query_aux = ''
+    for id in custom_list:
+        if custom_list.index(id) == 0:
+            query_aux += f"'{id}'"
+        else:
+            query_aux += f" OR name = '{id}'"
+    query_with_speed = f"SELECT * FROM sandbox.fleet WHERE name = {query_aux} AND elevation != 0 AND speed > 0"
+    query_without_speed = f"SELECT * FROM sandbox.fleet WHERE name = {query_aux} AND elevation != 0 AND speed = 0"
+
 
 #-----------QUERYS-----------
 def get_data_from_db_combined():

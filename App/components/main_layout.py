@@ -1,5 +1,6 @@
 from dash import dcc, html
 import plotly.graph_objs as go
+from database.queries import nombres_flota
 
 # Lista de alertas (camiones con velocidad baja)
 alertas = []
@@ -8,6 +9,8 @@ camiones = [
     "gps_c07", "gps_c15", "gps_c17", 
     "gps_c37", "gps_c49", "gps_c56"
 ]
+
+df_nombres_flota = nombres_flota()
 
 main_layout = html.Div(
     className="container",
@@ -49,15 +52,14 @@ main_layout = html.Div(
                     className="filters",
                     children=[
                         html.H2("Filtros"),
-                        dcc.Checklist(
-                            options=[{"label": "Flota", "value": "fleet"}],
-                            id="fleet-checklist",
-                            className="dccChecklist"
-                        ),
-                        dcc.Checklist(
-                            options=[{"label": "ID", "value": "id"}],
-                            id="id-checklist",
-                            className="dccChecklist"
+                        dcc.Dropdown(
+                            id="tiff-dropdown",
+                            options=[
+                                {"label": "REE.tif", "value": "REE"},
+                                {"label": "RES.tif", "value": "RES"}
+                            ],
+                            placeholder="Seleccionar TIFF",
+                            className="dccDropdown"
                         ),
                         dcc.Dropdown(
                             id="camion-dropdown",
@@ -68,21 +70,20 @@ main_layout = html.Div(
                             placeholder="Seleccionar Camión",
                             className="dccDropdown"
                         ),
-                        html.Button("+", className="add-button"),
                         dcc.Dropdown(
-                            id="tiff-dropdown",
+                            id="flota-dropdown",
                             options=[
-                                {"label": "REE.tif", "value": "REE"},
-                                {"label": "RES.tif", "value": "RES"}
+                                {"label": flota, "value": flota}
+                                for flota in df_nombres_flota
                             ],
-                            placeholder="Seleccionar TIFF",
+                            placeholder="Seleccionar Flota",
                             className="dccDropdown"
                         ),
+                        html.Button("Agregar Puntos", className="add-button", id="add-map-points-button"),
+                        html.Button("Quitar Puntos", className="delete-button", id="delete-map-points-button"),
                         html.Div(
                             className="operators",
                             children=[
-                                html.Button("Agregar Puntos", className="add-button", id="add-map-points-button"),
-                                html.Button("Quitar Puntos", className="add-button", id="delete-map-points-button"),
                                 dcc.Store(id="points-cleared", data=False), #Indica si los puntos se han borrado recientemente
                                 html.H2("Reportes"),
                                 dcc.Link("Tabla de Operadores", href="/tabla-operadores", className="redirection"),

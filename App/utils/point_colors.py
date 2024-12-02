@@ -9,6 +9,6 @@ def generate_point_colors(num_colors):
             # Evita colores cercanos al blanco
             if not (r > 240 and g > 240 and b > 240):  
                 break
-        color = f'rgba({r}, {g}, {b}, 0.8)'  # Cambiado a 0.8 para mayor intensidad
+        color = f'rgba({r}, {g}, {b}, 0.9)'  # Cambiado a 0.8 para mayor intensidad
         colors.append(color)
     return colors

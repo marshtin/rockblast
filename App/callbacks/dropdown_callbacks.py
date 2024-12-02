@@ -4,8 +4,9 @@ from utils.clusters import create_and_save_clusters, generate_random_colors
 from utils.point_colors import generate_point_colors
 from database.queries import *
 import plotly.graph_objects as go
-from database.queries import puntos_flota
+from database.queries import puntos_camion
 from components.main_layout import camiones
+from components.main_layout import df_nombres_flota
 import dash
 import numpy as np
 
@@ -14,12 +15,13 @@ def register_dropdown_callbacks(app):
         Output("map-image", "figure"),
         [Input("tiff-dropdown", "value"),
          Input("camion-dropdown", "value"),
+         Input("flota-dropdown", "value"),
          Input("add-map-points-button", "n_clicks"),
          Input("delete-map-points-button", "n_clicks"),
          Input('cluster-button', "n_clicks")],
         [State("map-image", "figure"), State("points-cleared", "data")]
     )
-    def update_map(selected_tiff, selected_camion, n_clicks_add, n_clicks_delete, n_clicks_cluster, current_figure, points_cleared):
+    def update_map(selected_tiff, selected_camion, selected_flota, n_clicks_add, n_clicks_delete, n_clicks_cluster, current_figure, points_cleared):
         # Verificar cuál de los inputs disparó el callback
         ctx = dash.callback_context
 
@@ -62,24 +64,25 @@ def register_dropdown_callbacks(app):
 
         # Si se presionó el botón "Agregar Puntos"
         if trigger == "add-map-points-button" and n_clicks_add:
+            #Si se selecciona el dropdown de camion
             if selected_camion:
-                # Recuperar los puntos de flota
-                x_query, y_query, s_query = puntos_flota(selected_camion)
+                # Recuperar los puntos de camión
+                x_query_camion, y_query_camion, s_query_camion = puntos_camion(selected_camion)
                 
-                if x_query and y_query and s_query:
+                if x_query_camion and y_query_camion and s_query_camion:
                     # Generar colores únicos para cada camión
-                    color_map = dict(zip(camiones, generate_point_colors(len(camiones))))
+                    color_map_camion = dict(zip(camiones, generate_point_colors(len(camiones))))
                     # Texto para mostrar velocidad en el tooltip
-                    tooltips = [f"Velocidad: {speed} km/h" for speed in s_query]
+                    tooltips = [f"Velocidad: {speed} km/h" for speed in s_query_camion]
 
                     points = go.Scatter(
-                        x=x_query,
-                        y=y_query,
+                        x=x_query_camion,
+                        y=y_query_camion,
                         mode='markers',
                         marker=dict(
                             size= 8,  # Tamaño fijo
-                            color=color_map[selected_camion],  # Color dinámico basado en el camión
-                            opacity=0.8
+                            color=color_map_camion[selected_camion],  # Color dinámico basado en el camión
+                            opacity=0.9
                         ),
                         text=tooltips,  # Información mostrada en el tooltip
                         hoverinfo='text',  # Muestra únicamente el texto en el tooltip
@@ -87,14 +90,39 @@ def register_dropdown_callbacks(app):
                     )
                     current_figure.add_trace(points)
                     
+            #Si se selecciona el dropdown de flota        
+            if selected_flota:
+                # Recuperar los puntos de flota
+                x_query_flota, y_query_flota, s_query_flota = puntos_flota(selected_flota)
+                
+                if x_query_flota and y_query_flota and s_query_flota:
+                    # Generar colores únicos para cada camión
+                    color_map_flota = dict(zip(df_nombres_flota, generate_point_colors(len(df_nombres_flota))))
+                    # Texto para mostrar velocidad en el tooltip
+                    tooltips = [f"Velocidad: {speed} km/h" for speed in s_query_flota]
 
+                    points = go.Scatter(
+                        x=x_query_flota,
+                        y=y_query_flota,
+                        mode='markers',
+                        marker=dict(
+                            size= 8,  # Tamaño fijo
+                            color=color_map_flota[selected_flota],  # Color dinámico basado en el camión
+                            opacity=0.9
+                        ),
+                        text=tooltips,  # Información mostrada en el tooltip
+                        hoverinfo='text',  # Muestra únicamente el texto en el tooltip
+                        name=f'Puntos Flota {selected_flota}'
+                    )
+                    current_figure.add_trace(points)
+                    
             return current_figure
 
         # Si se presionó el botón "Borrar Puntos"
         if trigger == "delete-map-points-button" and n_clicks_delete:
             new_data = [
                 trace for trace in current_figure.data
-                if not (trace.name and trace.name.startswith('Puntos Camión'))
+                if not (trace.name and trace.name.startswith('Puntos'))
             ]
             current_figure.data = new_data
             return current_figure
@@ -161,3 +189,24 @@ def register_dropdown_callbacks(app):
         if n_clicks_delete:
             return True
         return points_cleared
+    
+    # Callback para que un solo filtro sea seleccionado a la vez
+    @app.callback(
+    [Output("camion-dropdown", "value", allow_duplicate=True), Output("flota-dropdown", "value")],
+    [Input("camion-dropdown", "value"), Input("flota-dropdown", "value")],
+    prevent_initial_call=True
+    )
+    def reset_dropdown(selected_camion, selected_flota):
+        ctx = dash.callback_context
+        if not ctx.triggered:
+            return dash.no_update, dash.no_update
+
+        trigger = ctx.triggered[0]["prop_id"].split(".")[0]
+
+        # Si se selecciona un camión, resetea la flota, y viceversa
+        if trigger == "camion-dropdown" and selected_camion:
+            return selected_camion, None
+        elif trigger == "flota-dropdown" and selected_flota:
+            return None, selected_flota
+
+        return dash.no_update, dash.no_update

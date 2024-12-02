@@ -8,48 +8,52 @@ from database.connection import *
 import random
 
 def create_and_save_clusters(query, n_clusters=20, filename='cluster_info.pkl'):
-    # Connect to your database
-    conn = connect()
-    cur = conn.cursor()
-    #cur.execute('SELECT version()')
-    #db_version = cur.fetchone()
-    #print(db_version)
+    try:
+        # Conexión y ejecución de la consulta
+        conn = connect()
+        try:
+            df = pd.read_sql_query(query, conn)
+            
+        except Exception as e:
+            print(f"Error al ejecutar la consulta: {e}")
+            return pd.Dataframe(), {}
+        
+        print("Clustering data")
+        X = df[['latitude', 'longitude']]
 
-    # Load data into a DataFrame
-    df = pd.read_sql_query(query, conn)
+        kmeans = KMeans(n_clusters=n_clusters)
+        df['cluster'] = kmeans.fit_predict(X)
 
-    # Close the connection
-    #conn.close()
+        cluster_info = {}
+        for cluster in df['cluster'].unique():
+            cluster_data = df[df['cluster'] == cluster]
+            avg_speed = cluster_data['speed'].mean()
+            points = cluster_data[['latitude', 'longitude']].values
+            hull = ConvexHull(points)
+            cluster_info[cluster] = {
+                'average_speed': avg_speed,
+                'convex_hull': hull
+            }
 
-    print("Clustering data")
-    # Select features for clustering
-    X = df[['latitude', 'longitude']]
+        with open(filename, 'wb') as f:
+            pickle.dump(cluster_info, f)
+            
+        return df, cluster_info
 
-    # Apply K-Means clustering
-    kmeans = KMeans(n_clusters=n_clusters)
-    df['cluster'] = kmeans.fit_predict(X)
+    except psycopg2.InterfaceError as e:
+        print("Error interacting with the database: %s", str(e))
+        # Devuelve valores vacíos o un mensaje de error manejado
+        return pd.DataFrame(), {}
 
-    # Calculate the average speed for each cluster
-    cluster_info = {}
-    for cluster in df['cluster'].unique():
-        cluster_data = df[df['cluster'] == cluster]
-        avg_speed = cluster_data['speed'].mean()
+    except Exception as e:
+        print("Unexpected error: %s", str(e))
+        # Devuelve valores vacíos o un mensaje de error manejado
+        return pd.DataFrame(), {}
+    
+    finally:
+        if conn:
+            conn.close()
 
-        # Compute the Convex Hull
-        points = cluster_data[['latitude', 'longitude']].values
-        hull = ConvexHull(points)
-
-        # Save the cluster information
-        cluster_info[cluster] = {
-            'average_speed': avg_speed,
-            'convex_hull': hull
-        }
-
-    # Save the cluster information to a file
-    with open(filename, 'wb') as f:
-        pickle.dump(cluster_info, f)
-
-    return df, cluster_info
 
 def classify_new_point(lat, lon, speed, cluster_info):
     point = np.array([lat, lon])

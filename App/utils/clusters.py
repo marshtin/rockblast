@@ -51,18 +51,6 @@ def create_and_save_clusters(query, n_clusters=20, filename='cluster_info.pkl'):
 
     return df, cluster_info
 
-def classify_new_point(lat, lon, speed, cluster_info):
-    point = np.array([lat, lon])
-    for cluster, info in cluster_info.items():
-        hull = info['convex_hull']
-        if all(np.dot(eq[:-1], point) + eq[-1] <= 0 for eq in hull.equations):
-            avg_speed = info['average_speed']
-            if speed > avg_speed:
-                return cluster, 'above average'
-            else:
-                return cluster, 'below average'
-    return None, 'outside all clusters'
-
 def display_cluster_borders(df, cluster_info, new_point=None):
     plt.figure(figsize=(10, 8))
     for cluster in df['cluster'].unique():
@@ -92,6 +80,39 @@ def generate_random_colors(num_colors):
         color = f'rgba({random.randint(0, 255)}, {random.randint(0, 255)}, {random.randint(0, 255)}, 0.2)'
         colors.append(color)
     return colors
+
+def classify_points(df, cluster_info, selected_camion):
+    results = []
+    
+    # Iterate over each row in the DataFrame
+    for index, row in df.iterrows():
+        lat = row['latitude']
+        lon = row['longitude']
+        speed = row['speed']
+        time = row['time']
+        
+        point = np.array([lat, lon])
+        classified = False
+        
+        # Iterate over each cluster in the cluster_info dictionary
+        for cluster, info in cluster_info.items():
+            hull = info['convex_hull']
+            
+            # Check if the point lies within the convex hull using the hull's equations
+            if all(np.dot(eq[:-1], point) + eq[-1] <= 0 for eq in hull.equations):
+                avg_speed = info['average_speed']
+                threshold_speed = 0.75 * avg_speed
+                
+                # Only add to results if the speed is below 75% of the average speed
+                if speed <= threshold_speed:
+                    results.append([str(selected_camion), str(time), str(speed), str(cluster), str(avg_speed)])
+                
+                classified = True
+                break
+        
+        # No need to add points that are outside all clusters or above 75% of the average speed
+
+    return results
 
 """
 

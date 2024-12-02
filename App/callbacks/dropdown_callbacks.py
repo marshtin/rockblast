@@ -1,17 +1,20 @@
-from dash import Input, Output, State
+from dash import Input, Output, State, html, dcc
 from utils.load_tiff import transformar_tiff
-from utils.clusters import create_and_save_clusters, generate_random_colors
+from utils.clusters import *
 from utils.point_colors import generate_point_colors
 from database.queries import *
 import plotly.graph_objects as go
 from database.queries import puntos_flota
 from components.main_layout import camiones
+from components.main_layout import alertas
 import dash
 import numpy as np
+import pickle
 
 def register_dropdown_callbacks(app):
     @app.callback(
-        Output("map-image", "figure"),
+        [Output("map-image", "figure"),
+        Output('alertas-store', 'data')],
         [Input("tiff-dropdown", "value"),
          Input("camion-dropdown", "value"),
          Input("add-map-points-button", "n_clicks"),
@@ -22,7 +25,7 @@ def register_dropdown_callbacks(app):
     def update_map(selected_tiff, selected_camion, n_clicks_add, n_clicks_delete, n_clicks_cluster, current_figure, points_cleared):
         # Verificar cuál de los inputs disparó el callback
         ctx = dash.callback_context
-
+        alertas = []
         if not ctx.triggered:
             return current_figure
 
@@ -37,11 +40,10 @@ def register_dropdown_callbacks(app):
 
         # Si se seleccionó un TIFF en el dropdown
         if trigger == "tiff-dropdown" and selected_tiff:
-            tiff_path = f"rockblast/App/data/{selected_tiff}.tif"
+            tiff_path = f"App/data/{selected_tiff}.tif"
             tiff_base64, extent = transformar_tiff(tiff_path)
 
             layout = go.Layout(
-                title=f'TIFF con Puntos - {selected_tiff}',
                 images=[{
                     'source': f"data:image/png;base64,{tiff_base64}",
                     'xref': "x",
@@ -58,15 +60,15 @@ def register_dropdown_callbacks(app):
                 showlegend=True,
                 autosize=True
             )
-            return go.Figure(layout=layout, data=[])
+            return go.Figure(layout=layout, data=[]), alertas
 
         # Si se presionó el botón "Agregar Puntos"
         if trigger == "add-map-points-button" and n_clicks_add:
             if selected_camion:
                 # Recuperar los puntos de flota
-                x_query, y_query, s_query = puntos_flota(selected_camion)
+                x_query, y_query, s_query, x_0, y_0, s_0, df = puntos_flota(selected_camion)
                 
-                if x_query and y_query and s_query:
+                if x_query and y_query and s_query and x_0 and y_0 and s_0:
                     # Generar colores únicos para cada camión
                     color_map = dict(zip(camiones, generate_point_colors(len(camiones))))
                     # Texto para mostrar velocidad en el tooltip
@@ -77,18 +79,38 @@ def register_dropdown_callbacks(app):
                         y=y_query,
                         mode='markers',
                         marker=dict(
-                            size= 8,  # Tamaño fijo
+                            size= 10,  # Tamaño fijo
                             color=color_map[selected_camion],  # Color dinámico basado en el camión
-                            opacity=0.8
+                            opacity=0.9
                         ),
                         text=tooltips,  # Información mostrada en el tooltip
                         hoverinfo='text',  # Muestra únicamente el texto en el tooltip
                         name=f'Puntos Camión {selected_camion}'
                     )
                     current_figure.add_trace(points)
-                    
 
-            return current_figure
+                    tooltips_0 = [f"Velocidad: {speed} km/h" for speed in s_0]
+                    points_0 = go.Scatter(
+                        x=x_0,
+                        y=y_0,
+                        mode='markers',
+                        marker=dict(
+                            size= 10,  # Tamaño fijo
+                            color="red",  # Color fijo para velocidad 0
+                            opacity=0.9
+                        ),
+                        text=tooltips_0,  # Información mostrada en el tooltip
+                        hoverinfo='text',  # Muestra únicamente el texto en el tooltip
+                        name=f'Puntos Camión {selected_camion} Detención'
+                    )
+                    current_figure.add_trace(points_0)
+
+                    with open('cluster_info.pkl', 'rb') as f:
+                        loaded_cluster_info = pickle.load(f)
+                        alerts = classify_points(df, loaded_cluster_info, selected_camion)
+                        alertas += alerts
+                    
+            return current_figure, alertas
 
         # Si se presionó el botón "Borrar Puntos"
         if trigger == "delete-map-points-button" and n_clicks_delete:
@@ -97,7 +119,7 @@ def register_dropdown_callbacks(app):
                 if not (trace.name and trace.name.startswith('Puntos Camión'))
             ]
             current_figure.data = new_data
-            return current_figure
+            return current_figure, alertas
     
         # Si se presionó el botón "Actualizar Clusters"
         if trigger == "cluster-button" and n_clicks_cluster:
@@ -125,15 +147,14 @@ def register_dropdown_callbacks(app):
                 ))
 
             current_figure.update_layout(
-                title='GPS Data Clustering with Convex Hull Boundaries',
                 xaxis_title='Longitude',
                 yaxis_title='Latitude'
             )
-            return current_figure
+            return current_figure, alertas
 
-        return current_figure
+        return current_figure, alertas
 
-    # Define the callback para alternar la visibilidad de clusters
+    # Callback para alternar la visibilidad de clusters
     @app.callback(
         [Output("map-image", "figure", allow_duplicate=True), Output("clusters-visible", "data")],
         [Input("toggle-clusters-button", "n_clicks")],
@@ -161,3 +182,29 @@ def register_dropdown_callbacks(app):
         if n_clicks_delete:
             return True
         return points_cleared
+    
+    # Callback para actualizar alertas
+    @app.callback(
+        Output('alert-container', 'children'),
+        Input('alertas-store', 'data')
+    )
+    def update_alert_container(alertas):
+        return [
+            html.Div(className="alert-item", children=[
+                html.Img(src="assets/pngs/icono_alerta.png", alt="Icono de alerta"),
+                html.Span(f"Camión {alerta[0]} - Vel {alerta[2]} - Clus {alerta[3]} - Avrg {alerta[4]}")
+            ]) for alerta in alertas
+        ]
+    
+    # Callback para borrar las alertas
+    """
+    @app.callback(
+        Output('alertas-store', 'data', allow_duplicate=True),
+        Input('clear-alerts-button', 'n_clicks'),
+        State('alertas-store', 'data')
+    )
+    def clear_alerts(n_clicks, alertas):
+        if n_clicks:
+            return []
+        return alertas
+        """

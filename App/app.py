@@ -26,6 +26,5 @@ atexit.register(save_cache)
 def cleanup(_):
     close_conn()
 
-
 if __name__ == "__main__":
     app.run_server(debug=True, use_reloader=False)

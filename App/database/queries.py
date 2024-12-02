@@ -10,7 +10,7 @@ def puntos_flota(query_aux):
     query2= (f"""SELECT time, latitude, longitude, elevation, speed 
         FROM sandbox.{query_aux} 
         WHERE time >= (
-            SELECT MAX(time) - INTERVAL '2 HOURS' 
+            SELECT MAX(time) - INTERVAL '4 HOURS' 
             FROM sandbox.{query_aux}
             )
         ORDER BY time;""")
@@ -21,17 +21,25 @@ def puntos_flota(query_aux):
     try:
         # Cargar los datos en un DataFrame
         df = pd.read_sql_query(query2, conn)
-        
+        df_1 = df[df['speed'] > 0]
+
         # Preparación de datos para el gráfico
-        x = df['longitude'].tolist()
-        y = df['latitude'].tolist()
+        x = df_1['longitude'].tolist()
+        y = df_1['latitude'].tolist()
         #z = df['elevation'].tolist()
-        s = df['speed'].tolist()
-        return x, y, s #retorna longitud, latitud y velocidad
+        s = df_1['speed'].tolist()
+        
+        df_0 = df[df['speed'] == 0]
+        x_0 = df_0['longitude'].tolist()
+        y_0 = df_0['latitude'].tolist()
+        #z_0 = df['elevation'].tolist()
+        s_0 = df_0['speed'].tolist()
+
+        return x, y, s, x_0, y_0, s_0, df #retorna longitud, latitud y velocidad
     
     except Exception as e:
         print(f"Error al cargar datos al dataframe: {e}")
-        return [],[],[] #Retorna listas vacías en caso de error
+        return [],[],[],[],[],[], pd.DataFrame() #Retorna listas vacías en caso de error
     finally:
         # Cierra la conexión a la base de datos
         if conn:

@@ -2,12 +2,7 @@ from dash import dcc, html
 import plotly.graph_objs as go
 
 # Lista de alertas (camiones con velocidad baja)
-alertas = [
-    "Camión 1 - Hola", "Camión 2 - Cómo", "Camión 3 - Estás", 
-    "Camión 4 - Bajo", "Camión 5 - Bajo", "Camión 6 - Bajo", 
-    "Camión 7 - Bajo", "Camión 8 - Bajo", "Camión 9 - Bajo", 
-    "Camión 10 - Bajo", "Camión 11 - Bajo", "Camión 12 - Bajo"
-]
+alertas = []
 
 camiones = [
     "gps_c07", "gps_c15", "gps_c17", 
@@ -26,6 +21,7 @@ main_layout = html.Div(
                 
                 # Contenedor de alertas con barra deslizadora
                 html.Div(
+                    id="alert-container",
                     className="alert-container",
                     children=[
                         html.Div(className="alert-item", children=[
@@ -125,7 +121,9 @@ main_layout = html.Div(
                     }
                 )
             ]
-        )
+        ),
+        # Store para mantener la lista de alertas
+        dcc.Store(id='alertas-store', data=alertas)
     ]
 )
 

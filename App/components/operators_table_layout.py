@@ -1,4 +1,4 @@
-from dash import html
+from dash import html, dcc
 
 tabla_operadores_layout = html.Div(
     className="operators-tab-container",
@@ -18,7 +18,8 @@ tabla_operadores_layout = html.Div(
                 ),
                 html.H2("Tabla de Operadores"),
                 html.Button("Actualizar Resumen", className="refresh-button", id="refresh-operadores"),
-                html.Button("Descargar", className="download-button", id="download-operadores-report")
+                html.Button("Descargar", className="download-button", id="download-operadores-report"),
+                dcc.Download(id="download-excel")
             ]
         ),
         html.Div(

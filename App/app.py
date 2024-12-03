@@ -2,10 +2,11 @@ from dash import Dash
 from components import layout  # Importa el layout principal
 from callbacks.routes_callback import register_routes_callbacks  # Callbacks de rutas
 from callbacks.dropdown_callbacks import register_dropdown_callbacks  # Callbacks del dropdown
-from callbacks.operators_callbacks import register_operator_callbacks
+from callbacks.operators_callbacks import register_operator_callbacks, register_download_callback
 from database.connection import close_conn
 import atexit
 from utils.load_tiff import save_cache  # Importa la función para guardar el caché
+
 
 # Inicializa la app de Dash
 app = Dash(__name__, suppress_callback_exceptions=True)
@@ -17,7 +18,7 @@ app.layout = layout.layout
 register_routes_callbacks(app)
 register_dropdown_callbacks(app)
 register_operator_callbacks(app)
-
+register_download_callback(app)
 # Guardar el caché de TIFFs al salir de la aplicación
 atexit.register(save_cache)
 

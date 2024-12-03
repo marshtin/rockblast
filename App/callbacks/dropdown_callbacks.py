@@ -42,7 +42,7 @@ def register_dropdown_callbacks(app):
 
         # Si se seleccionó un TIFF en el dropdown
         if trigger == "tiff-dropdown" and selected_tiff:
-            tiff_path = f"App/data/{selected_tiff}.tif"
+            tiff_path = f"rockblast/App/data/{selected_tiff}.tif"
             tiff_base64, extent = transformar_tiff(tiff_path)
 
             layout = go.Layout(

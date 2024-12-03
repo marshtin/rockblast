@@ -1,17 +1,12 @@
-from dash import Input, Output, State
-from utils.load_tiff import transformar_tiff
-from utils.clusters import create_and_save_clusters, generate_random_colors
+from dash import Input, Output
 from database.queries import *
-import plotly.graph_objects as go
 from database.queries import get_data_from_db_combined
-import dash
-import numpy as np
 from dash import dash_table, html
 
 def register_operator_callbacks(app):
     @app.callback(
-        Output('table-container', 'children'),  # Contenedor donde se mostrarán las tablas
-        Input('add-operadores', 'n_clicks')  # Botón que activa el callback
+        Output('tables-container', 'children'),  # Contenedor donde se mostrarán las tablas
+        Input('refresh-operadores', 'n_clicks')  # Botón que activa el callback
     )
     def update_table(n_clicks):
         # Verificar si se presionó el botón
@@ -24,7 +19,7 @@ def register_operator_callbacks(app):
                 if not df_load.empty and not df_dumps.empty and not df_time_extremes.empty:
                     # Crear y devolver las tablas con los datos
                     return html.Div([
-                        html.H4("Ranking de Carga"),  # Encabezado para la primera tabla
+                        html.H3("Ranking de Carga"),  # Encabezado para la primera tabla
                         dash_table.DataTable(
                             id="table-loads",
                             columns=[
@@ -44,7 +39,7 @@ def register_operator_callbacks(app):
                                 'fontWeight': 'bold'
                             }
                         ),
-                        html.H4("Ranking de Descargas"),  # Encabezado para la segunda tabla
+                        html.H3("Ranking de Descargas"),  # Encabezado para la segunda tabla
                         dash_table.DataTable(
                             id="table-dumps",
                             columns=[
@@ -64,7 +59,7 @@ def register_operator_callbacks(app):
                                 'fontWeight': 'bold'
                             }
                         ),
-                        html.H4("Comparación entre el mejor y el peor operador"),  # Encabezado para la tercera tabla
+                        html.H3("Comparación entre el mejor y el peor operador"),  # Encabezado para la tercera tabla
                         dash_table.DataTable(
                             id="table-time-extremes",
                             columns=[
@@ -95,4 +90,3 @@ def register_operator_callbacks(app):
         
         # Devolver un Div vacío si el botón no ha sido presionado
         return html.Div()
-

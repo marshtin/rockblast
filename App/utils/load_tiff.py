@@ -12,7 +12,7 @@ import os
 tiff_cache = {}
 
 # Ruta absoluta para el caché
-CACHE_FILE = os.path.abspath("App/data/tiff_cache.pkl")
+CACHE_FILE = os.path.abspath("rockblast/App/data/tiff_cache.pkl")
 
 # Cargar el caché al iniciar si el archivo existe
 if os.path.exists(CACHE_FILE):

@@ -1,9 +1,8 @@
-from dash import dcc, html
+from dash import html
 
 tabla_operadores_layout = html.Div(
-    className="table-section",  # Aplicar la clase principal para el contenedor de tablas
+    className="operators-tab-container",
     children=[
-        # Encabezado de la página de tabla de operadores
         html.Div(
             className="operators-tab-header",
             children=[
@@ -18,20 +17,13 @@ tabla_operadores_layout = html.Div(
                     )
                 ),
                 html.H2("Tabla de Operadores"),
-                html.Button("Resumen de Operadores", className="add-button", id="add-operadores")
+                html.Button("Actualizar Resumen", className="refresh-button", id="refresh-operadores"),
+                html.Button("Descargar", className="download-button", id="download-operadores-report")
             ]
         ),
-        
-        # Contenedor de las tablas
         html.Div(
-            className="tables-container",  # Clase para organizar las tablas
-            children=[
-                # Contenedor para las tablas dinámicas generadas por Dash
-                html.Div(
-                    id='table-container',  # Este ID se utiliza en el callback para insertar las tablas
-                    className="table-container"  # Clase individual para las tablas
-                )
-            ]
+            id='tables-container',
+            className="tables-container"  # Clase para ajustar el contenedor
         )
     ]
 )

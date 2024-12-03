@@ -32,14 +32,6 @@ main_layout = html.Div(
                             html.Span(alerta)
                         ]) for alerta in alertas
                     ]
-                ),
-                # Botones debajo del contenedor de alertas
-                html.Div(
-                    className="sidebar-buttons",
-                    children=[
-                        html.Button("Borrar"),
-                        html.Button("Detalle")
-                    ]
                 )
             ]
         ),
@@ -81,21 +73,21 @@ main_layout = html.Div(
                         ),
                         html.Button("Agregar Puntos", className="add-button", id="add-map-points-button"),
                         html.Button("Quitar Puntos", className="delete-button", id="delete-map-points-button"),
-                        html.Div(
-                            className="operators",
-                            children=[
-                                dcc.Store(id="points-cleared", data=False), #Indica si los puntos se han borrado recientemente
-                                html.H2("Reportes"),
-                                dcc.Link("Tabla de Operadores", href="/tabla-operadores", className="redirection"),
-                                dcc.Link("Generar Reporte", href="/reporte", className="redirection")
-                            ]
-                        ),
+                        html.H2("Clusters"),
                         html.Div(
                             className="clusters",
                             children=[
                                 html.Button("Generar clusters", className="cluster-button", id="cluster-button", n_clicks=0),
                                 html.Button('Ocultar/Mostrar', className="cluster-button", id='toggle-clusters-button', n_clicks=0),
                                 dcc.Store(id='clusters-visible', data=True)  # Store to keep track of clusters visibility
+                            ]
+                        ),
+                        html.Div(
+                            className="operators",
+                            children=[
+                                dcc.Store(id="points-cleared", data=False), #Indica si los puntos se han borrado recientemente
+                                html.H2("Reportes"),
+                                dcc.Link("Tabla de Operadores", href="/tabla-operadores", className="redirection")
                             ]
                         )
                     ]

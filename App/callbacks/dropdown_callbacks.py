@@ -29,7 +29,7 @@ def register_dropdown_callbacks(app):
         ctx = dash.callback_context
         alertas = []
         if not ctx.triggered:
-            return current_figure
+            return current_figure, []
 
         # Comprobar cuál fue el input que disparó el callback
         trigger = ctx.triggered[0]['prop_id'].split('.')[0]

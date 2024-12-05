@@ -17,6 +17,7 @@ app.py: ejecuta la aplicacion
 Ejecutar a traves de docker, para omitir descarga individual de dependencias/librerias.
 -Paso 1 Instalar Docker.
 -Paso 2 Descargar el proyecto desde GitHub.
+-Paso 3 Cargar tifs según instrucciones anteriores.
 -Paso 3 Construir la imagen con docker build.
 -Paso 3.1 "docker build -t rockblast-app ."
 -Paso 4 Ejecutar el contenedor con docker run.
